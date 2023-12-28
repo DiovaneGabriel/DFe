@@ -14,3 +14,8 @@ up:
 
 down:
 	docker compose down
+
+autoload:
+	clear && \
+	sudo rm -rf vendor/ && \
+	docker exec -it php-test sh -c "cd /var/www/html && composer dump-autoload"

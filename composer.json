@@ -1,1 +1,20 @@
-{}
+{
+    "name": "diovanegabriel/dfe",
+    "description": "Integração com documentos fiscais eletronicos",
+    "type": "library",
+    "keywords": ["DF-e","NFS-e"],
+    "license": "MIT",
+    "version": "v1.0.0",
+    "authors": [
+        {
+            "name": "Diovane Barbieri Gabriel"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Libraries\\": "src/libraries/",
+            "Entities\\": "src/entities/",
+            "DFe\\": "src/DFe/"
+        }
+    }
+}
