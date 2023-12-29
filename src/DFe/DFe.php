@@ -2,47 +2,77 @@
 
 namespace DFe;
 
-use Entities\Emissor;
+use Entities\Emitente;
+use Libraries\Constants;
 
 abstract class DFe
 {
-
-    const AMBIENTE_PRODUCAO = 1;
-    const AMBIENTE_HOMOLOGACAO = 2;
-
     protected $xml;
 
     private int $ambiente;
-    private Emissor $emissor;
+    private Emitente $emitente;
+    private string $urlWebservice;
 
     abstract public function cancelar(int $numero, int $serie, string $motivo);
     abstract public function emitir();
 
-    abstract protected function getUrl();
-
-    abstract public static function getInstance(Emissor $emissor, int $ambiente = self::AMBIENTE_HOMOLOGACAO);
-
-    function __construct(Emissor $emissor, int $ambiente = self::AMBIENTE_HOMOLOGACAO)
+    function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO)
     {
-        $this->emissor = $emissor;
-        $this->ambiente = $ambiente;
+        $this->setEmitente($emitente);
+        $this->setAmbiente($ambiente);
     }
 
-    public function setAmbiente(int $ambiente)
-    {
-        $this->ambiente = $ambiente;
-    }
+    /**
+     * Get the value of ambiente
+     */
     public function getAmbiente(): int
     {
         return $this->ambiente;
     }
 
-    public function setEmissor(Emissor $emissor)
+    /**
+     * Set the value of ambiente
+     */
+    public function setAmbiente(int $ambiente): self
     {
-        $this->emissor = $emissor;
+        $this->ambiente = $ambiente;
+
+        return $this;
     }
-    public function getEmissor(): Emissor
+
+    /**
+     * Get the value of Emitente
+     */
+    public function getEmitente(): Emitente
     {
-        return $this->emissor;
+        return $this->emitente;
+    }
+
+    /**
+     * Set the value of Emitente
+     */
+    public function setEmitente(Emitente $emitente): self
+    {
+        $this->emitente = $emitente;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of urlWebservice
+     */
+    public function getUrlWebservice(): string
+    {
+        return $this->urlWebservice;
+    }
+
+    /**
+     * Set the value of urlWebservice
+     */
+    public function setUrlWebservice(string $urlWebservice): self
+    {
+        $this->urlWebservice = $urlWebservice;
+
+        return $this;
     }
 }

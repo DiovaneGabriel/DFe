@@ -4,7 +4,6 @@ namespace Libraries;
 
 class XML
 {
-
     public static function createFromArray($array, $node_name = '', $replace = null)
     {
         $xml = '';

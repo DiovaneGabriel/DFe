@@ -2,38 +2,73 @@
 
 namespace DFe;
 
-use DFe\NFSe\NFSeIPM;
-use Entities\Emissor;
+use Entities\ConfiguracaoCidade;
+use Entities\Emitente;
+use Exception;
+use Libraries\Constants;
 
-abstract class NFSe extends DFe
+class NFSe extends DFe
 {
-    // public function cancelar()
-    // {
-    // }
+    private NFSe $nfse;
 
-    // public function emitir()
-    // {
-    // }
-
-    public static function getInstance(Emissor $emissor, int $ambiente = self::AMBIENTE_HOMOLOGACAO): NFSeIPM
+    public function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO, bool $calledByChild = false)
     {
-        if ($emissor->getCidadeCodigoIbge() == 4319901) {
-            return new NFSeIPM($emissor, $ambiente);
+        $configuracaoCidade = ConfiguracaoCidade::getConfiguracaoCidade($emitente->getCidadeCodigoIbge());
+
+        if (!$configuracaoCidade) {
+            throw new Exception("Configuração para a cidade " . $emitente->getCidadeCodigoIbge() . " inexistente!");
         }
-        return null;
+
+        if ($calledByChild) {
+            if (
+                ($ambiente == Constants::AMBIENTE_PRODUCAO && !$configuracaoCidade->getUrlWebserviceProducao()) ||
+                ($ambiente == Constants::AMBIENTE_HOMOLOGACAO && !$configuracaoCidade->getUrlWebserviceHomologacao())
+            ) {
+                throw new Exception("Url do ambiente de " .
+                    ($ambiente == Constants::AMBIENTE_PRODUCAO ?
+                        "produção" :
+                        "homologação") . " inexistente!");
+            }
+
+            $emitente->setCidadeCodigoTom($configuracaoCidade->getCidadeCodigoTom());
+
+            $this->setUrlWebservice(
+                Constants::AMBIENTE_PRODUCAO ?
+                    $configuracaoCidade->getUrlWebserviceProducao() :
+                    $configuracaoCidade->getUrlWebserviceHomologacao()
+            );
+
+            parent::__construct($emitente, $ambiente);
+        } else {
+            $this->nfse = new ("DFe\\NFSe\\" . $configuracaoCidade->getClasseNFSe())($emitente, $ambiente, true);
+        }
     }
 
-    protected function getUrl()
+    /**
+     * Get the value of nfse
+     */
+    public function getNfse(): NFSe
     {
-        $urls = [
-            DFe::AMBIENTE_PRODUCAO => [
-                "4319901" => "https://nfse-sapiranga.atende.net/atende.php?pg=rest&service=WNERestServiceNFSe&cidade=padrao"
-            ],
-            DFe::AMBIENTE_HOMOLOGACAO => [
-                "4319901" => "https://nfse-sapiranga.atende.net/atende.php?pg=rest&service=WNERestServiceNFSe&cidade=padrao"
-            ]
-        ];
+        return $this->nfse;
+    }
 
-        return $urls[$this->getAmbiente()][$this->getEmissor()->getCidadeCodigoIbge()];
+    /**
+     * Set the value of nfse
+     */
+    public function setNfse(NFSe $nfse): self
+    {
+        $this->nfse = $nfse;
+
+        return $this;
+    }
+
+    public function cancelar(int $numero, int $serie, string $motivo)
+    {
+        return $this->nfse->cancelar($numero, $serie, $motivo);
+    }
+
+    public function emitir()
+    {
+        return $this->nfse->emitir();
     }
 }
