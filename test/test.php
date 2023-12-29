@@ -11,11 +11,10 @@ use Libraries\Constants;
 $emitente = new Emitente("DB Serviços de Informações Ltda", 4319901, "51941986000135", "Db51941!");
 $emitente->setEnderecoCidadeCodigoTom("8899");
 
-$tomador = new Pessoa("Diovane");
+$tomador = new Pessoa("Diovane Barbieri Gabriel");
 $tomador
     ->setTipo('F')
     ->setCpf('83532226049')
-    ->setSobrenome("Barbieri Gabriel")
     ->setEnderecoLogradouro("Avenida Antão de Farias")
     ->setEmail("diovane.gabriel@gmail.com")
     ->setEnderecoNumero("1267")
@@ -24,22 +23,7 @@ $tomador
     ->setEnderecoCidadeCodigoTom("8899")
     ->setEnderecoCep("93800126");
 
-
-// $id = 123;
-$nroRps = "4";
-$serie = "1";
-$data = "28/12/2023"; //TODO: criar formatador
-$valor = 1;
-$valorDesconto = 0;
-$valorIr = 0;
-$valorInss = 0;
-$valorContribuicaoSocial = 0;
-$valorRps = 0;
-$valorPis = 0;
-$valorCofins = 0;
-$observacao = "";
-
-$nfse = new NFSe($emitente, Constants::AMBIENTE_PRODUCAO);
+$nfse = new NFSe($emitente, Constants::AMBIENTE_HOMOLOGACAO);
 $nfse->setTomador($tomador);
 
 $nfseItem = new NFSeItem("Prestação de serviço");
@@ -51,17 +35,21 @@ $nfseItem
     ->setValorTributavel(1)
     ->setValor(1);
 
+// echo '<pre>';
+// var_dump(new DateTime());
+// die();
+
 $nfse
-    ->setNumeroRps(7)
+    ->setNumeroRps(13)
     ->setSerie(1)
     ->setDataFatoGerador(new DateTime(date("Y-m-d H:i:s")))
     ->setValor(1)
     ->addItem($nfseItem);
 
-// $retorno = $nfse->emitir();
+$nfse = $nfse->emitir();
 
-// $retorno = $nfse->cancelar(11, 1, "NFS-e emitida para teste");
+// $nfse = $nfse->cancelar(15, $nfse->getSerie(), "NFS-e emitida para teste");
 
 echo '<pre>';
-var_dump($retorno);
+var_dump($nfse);
 die();

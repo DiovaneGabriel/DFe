@@ -16,12 +16,15 @@ abstract class DFe
 
     private int $ambiente;
     private DateTime $dataEmissao;
+    private DateTime $dataCancelamento;
     private Emitente $emitente;
     private string $observacao;
     private string $serie;
     private string $urlWebservice;
     private int $numero;
     private string $protocoloAutorizacao;
+    private string $protocoloCancelamento;
+    private int $situacao;
     private float $valor;
     private float $valorCofins;
     private float $valorDesconto;
@@ -36,9 +39,13 @@ abstract class DFe
 
         $this->setAmbiente($ambiente);
         $this->setDataEmissao(new DateTime());
+        $this->setDataCancelamento(new DateTime());
         $this->setNumero(0);
+        $this->setProtocoloAutorizacao('');
+        $this->setProtocoloCancelamento('');
         $this->setObservacao("");
         $this->setSerie("");
+        $this->setSituacao(0);
         $this->setValor(0);
         $this->setValorCofins(0);
         $this->setValorDesconto(0);
@@ -275,6 +282,60 @@ abstract class DFe
     public function setProtocoloAutorizacao(string $protocoloAutorizacao): self
     {
         $this->protocoloAutorizacao = $protocoloAutorizacao;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of situacao
+     */
+    public function getSituacao(): int
+    {
+        return $this->situacao;
+    }
+
+    /**
+     * Set the value of situacao
+     */
+    public function setSituacao(int $situacao): self
+    {
+        $this->situacao = $situacao;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of dataCancelamento
+     */
+    public function getDataCancelamento(): DateTime
+    {
+        return $this->dataCancelamento;
+    }
+
+    /**
+     * Set the value of dataCancelamento
+     */
+    public function setDataCancelamento(DateTime $dataCancelamento): self
+    {
+        $this->dataCancelamento = $dataCancelamento;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of protocoloCancelamento
+     */
+    public function getProtocoloCancelamento(): string
+    {
+        return $this->protocoloCancelamento;
+    }
+
+    /**
+     * Set the value of protocoloCancelamento
+     */
+    public function setProtocoloCancelamento(string $protocoloCancelamento): self
+    {
+        $this->protocoloCancelamento = $protocoloCancelamento;
 
         return $this;
     }

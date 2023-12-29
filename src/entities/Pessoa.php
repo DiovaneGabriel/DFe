@@ -21,15 +21,12 @@ class Pessoa
     private string $inscricaoEstadual;
     private string $nome;
     private string $razaoSocial;
-    private string $sobrenome;
     private string $tipo;
 
     function __construct($nome)
     {
         $this->nome = $nome;
     }
-
-
 
     /**
      * Get the value of cnpj
@@ -333,24 +330,6 @@ class Pessoa
     public function setRazaoSocial(string $razaoSocial): self
     {
         $this->razaoSocial = $razaoSocial;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of sobrenome
-     */
-    public function getSobrenome(): string
-    {
-        return $this->sobrenome;
-    }
-
-    /**
-     * Set the value of sobrenome
-     */
-    public function setSobrenome(string $sobrenome): self
-    {
-        $this->sobrenome = $sobrenome;
 
         return $this;
     }

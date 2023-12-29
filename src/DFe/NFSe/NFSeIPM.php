@@ -6,6 +6,7 @@ use DateTime;
 use DFe\NFSe;
 use Exception;
 use Libraries\Cache;
+use Libraries\Constants;
 use Libraries\Format;
 use Libraries\Request;
 use Libraries\XML;
@@ -32,7 +33,16 @@ class NFSeIPM extends NFSe
 
         $this->xml = XML::createFromArray($nfse);
 
-        return $this->sendRequest();
+        if ($response = $this->sendRequest()) {
+            $xmlResponse = simplexml_load_string($response);
+
+            $this->setDataCancelamento(new DateTime(date("Y-m-d H:i:s")));
+            // $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
+            // $this->setProtocoloCancelamento(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
+            $this->setSituacao(Constants::SITUACAO_CANCELADO);
+        }
+
+        return $this;
     }
 
     public function emitir(): self
@@ -66,7 +76,6 @@ class NFSeIPM extends NFSe
         if (strtolower($pessoaTomador->getTipo()) == 'f') {
             $pessoaTomador->getCpf() ? $tomador["cpfcnpj"] =  $pessoaTomador->getCpf() : null;
             $pessoaTomador->getNome() ? $tomador["nome_razao_social"] =  $pessoaTomador->getNome() : null;
-            $pessoaTomador->getSobrenome() ? $tomador["sobrenome_nome_fantasia"] =  $pessoaTomador->getSobrenome() : null;
         } elseif (strtolower($pessoaTomador->getTipo()) == 'j') {
             $pessoaTomador->getCnpj() ? $tomador["cpfcnpj"] =  $pessoaTomador->getCnpj() : null;
             $pessoaTomador->getInscricaoEstadual() ? $tomador["ie"] =  $pessoaTomador->getInscricaoEstadual() : null;
@@ -109,34 +118,34 @@ class NFSeIPM extends NFSe
             $itens["lista" . $i] = $item;
         }
 
-        $nfse = [
-            "nfse" => [
-                // "identificador" => $id,
-                "rps" => [
-                    "nro_recibo_provisorio" => $this->getNumeroRps(),
-                    "serie_recibo_provisorio" => $this->getSerie(),
-                    "data_emissao_recibo_provisorio" => date("d/m/Y"),
-                    "hora_emissao_recibo_provisorio" => date("H:i:s")
-                ],
-                "nf" => $nf,
-                "prestador" => [
-                    "cpfcnpj" => $pessoaEmitente->getCnpj(),
-                    "cidade" => $pessoaEmitente->getEnderecoCidadeCodigoTom()
-                ],
-                "tomador" => $tomador,
-                "itens" => $itens
-            ]
-        ];
+        $nfse = null;
 
-        $this->xml = XML::createFromArray($nfse, '', ['lista']);
+        $this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO ? $nfse["nfse_teste"] = 1 : null;
+
+        $nfse["rps"] = [
+            "nro_recibo_provisorio" => $this->getNumeroRps(),
+            "serie_recibo_provisorio" => $this->getSerie(),
+            "data_emissao_recibo_provisorio" => date("d/m/Y"),
+            "hora_emissao_recibo_provisorio" => date("H:i:s")
+        ];
+        $nfse["nf"] = $nf;
+        $nfse["prestador"] = [
+            "cpfcnpj" => $pessoaEmitente->getCnpj(),
+            "cidade" => $pessoaEmitente->getEnderecoCidadeCodigoTom()
+        ];
+        $nfse["tomador"] = $tomador;
+        $nfse["itens"] = $itens;
+
+        $this->xml = XML::createFromArray([$nfse], 'nfse', ['lista']);
 
         if ($response = $this->sendRequest()) {
             $xmlResponse = simplexml_load_string($response);
 
             $this->setNumero(((array)$xmlResponse->numero_nfse)[0]);
-            $this->setDataEmissao(DateTime::createFromFormat('d/m/Y H:i:s',((array)$xmlResponse->data_nfse)[0] . " " . ((array)$xmlResponse->hora_nfse)[0]));
+            $this->setDataEmissao(DateTime::createFromFormat('d/m/Y H:i:s', ((array)$xmlResponse->data_nfse)[0] . " " . ((array)$xmlResponse->hora_nfse)[0]));
             $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
             $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
+            $this->setSituacao(Constants::SITUACAO_EMITIDO);
         }
 
         return $this;

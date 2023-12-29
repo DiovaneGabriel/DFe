@@ -98,13 +98,14 @@ class ConfiguracaoCidade
         $cidades = [];
         $addCidade = function (
             string $cidadeCodigoIbge,
+            string $classeNFSe,
             string $urlWebserviceProducao,
             string $urlWebserviceHomologacao = ""
         ) use (&$cidades) {
-            $cidades[$cidadeCodigoIbge] = new self($cidadeCodigoIbge,  $urlWebserviceProducao, $urlWebserviceHomologacao);
+            $cidades[$cidadeCodigoIbge] = new self($cidadeCodigoIbge,  $classeNFSe, $urlWebserviceProducao, $urlWebserviceHomologacao);
         };
 
-        $addCidade("4319901",  "NFSeIPM", "https://nfse-sapiranga.atende.net/atende.php?pg=rest&service=WNERestServiceNFSe&cidade=padrao");
+        $addCidade("4319901",  "NFSeIPM", "https://nfse-sapiranga.atende.net/atende.php?pg=rest&service=WNERestServiceNFSe&cidade=padrao", "https://nfse-sapiranga.atende.net/atende.php?pg=rest&service=WNERestServiceNFSe&cidade=padrao");
 
         return isset($cidades[$cidadeCodigoIbge]) ? $cidades[$cidadeCodigoIbge] : null;
     }
