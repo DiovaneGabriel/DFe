@@ -24,7 +24,7 @@ class NFSeIPM extends NFSe
                 ],
                 "prestador" => [
                     "cpfcnpj" => $this->getEmitente()->getCnpj(),
-                    "cidade" => $this->getEmitente()->getCidadeCodigoTom()
+                    "cidade" => $this->getEmitente()->getEnderecoCidadeCodigoTom()
                 ]
             ]
         ];
@@ -36,7 +36,12 @@ class NFSeIPM extends NFSe
 
     public function emitir()
     {
+
+        $pessoaEmitente = $this->getEmitente();
+        $pessoaTomador = $this->getTomador();
+
         $id = 123;
+        $nroRps = "123";
         $serie = "1";
         $data = "28/12/2023"; //TODO: criar formatador
         $valor = 1;
@@ -49,94 +54,102 @@ class NFSeIPM extends NFSe
         $valorCofins = 0;
         $observacao = "";
 
-        $enderecoInformado = 1;
-        $fisicaJuridica = 'F';
-        $documentoEstrangeiro = '123abc';
-        $estadoEstrangeiro = 'LG';
-        $paisEstrangeiro = 'Italia';
-        $cpfCnpj = '83532226049';
-        $ie = '';
-        $nomeRazaoSocial = '';
-        $sobrenomeNomeFantasia = '';
-        $logradouro = '';
-        $email = '';
-        $numeroResidencial = '';
-        $complemento = '';
-        $bairro = '';
-        $cidadeCodigoTom = '';
-        $cep = '';
-
-        $codigoSubitemListaServico = '';
-        $codigoAtividade = '';
-        $descritivo = '';
-        $aliquota = '';
-        $situacaoTributaria = '';
-        $valorTributavel = '';
+        $tributacaoMunicipioTomador = 0;
+        $codigoSubitemListaServico = '123';
+        $codigoAtividade = '123';
+        $descritivo = 'Prestação de serviço';
+        $aliquota = '2';
+        $situacaoTributaria = '0100';
         $valorDeducao = '';
         $valorIssrf = '';
+
+        $nf = null;
+        $serie ? $nf["serie_nfse"] = $serie : null;
+        $data ? $nf["data_fato_gerador"] = $data : null;
+        $nf["valor_total"] = $valor;
+        $valorDesconto ? $nf["valor_desconto"] = $valorDesconto : null;
+        $valorIr ? $nf["valor_ir"] = $valorIr : null;
+        $valorInss ? $nf["valor_inss"] = $valorInss : null;
+        $valorContribuicaoSocial ? $nf["valor_contribuicao_social"] = $valorContribuicaoSocial : null;
+        $valorRps ? $nf["valor_rps"] = $valorRps : null;
+        $valorPis ? $nf["valor_pis"] = $valorPis : null;
+        $valorCofins ? $nf["valor_cofins"] = $valorCofins : null;
+        $observacao ? $nf["observacao"] = $observacao : null;
+
+        $tomador = null;
+        $tomador["endereco_informado"] = $pessoaTomador->getEnderecoLogradouro() ? 1 : 0;
+        $tomador["tipo"] = strtoupper($pessoaTomador->getTipo());
+
+        if (strtolower($pessoaTomador->getTipo()) == 'e') {
+            $pessoaTomador->getDocumentoEstrangeiro() ? $tomador["identificador"] = $pessoaTomador->getDocumentoEstrangeiro() : null;
+            $pessoaTomador->getEnderecoEstado() ? $tomador["estado"] = $pessoaTomador->getEnderecoEstado() : null;
+            $pessoaTomador->getEnderecoPais() ? $tomador["pais"] = $pessoaTomador->getEnderecoPais() : null;
+        }
+
+        if (strtolower($pessoaTomador->getTipo()) == 'f') {
+            $pessoaTomador->getCpf() ? $tomador["cpfcnpj"] =  $pessoaTomador->getCpf() : null;
+            $pessoaTomador->getNome() ? $tomador["nome_razao_social"] =  $pessoaTomador->getNome() : null;
+            $pessoaTomador->getSobrenome() ? $tomador["sobrenome_nome_fantasia"] =  $pessoaTomador->getSobrenome() : null;
+        } elseif (strtolower($pessoaTomador->getTipo()) == 'j') {
+            $pessoaTomador->getCnpj() ? $tomador["cpfcnpj"] =  $pessoaTomador->getCnpj() : null;
+            $pessoaTomador->getInscricaoEstadual() ? $tomador["ie"] =  $pessoaTomador->getInscricaoEstadual() : null;
+            $pessoaTomador->getRazaoSocial() ? $tomador["nome_razao_social"] =  $pessoaTomador->getRazaoSocial() : null;
+            $pessoaTomador->getNome() ? $tomador["sobrenome_nome_fantasia"] =  $pessoaTomador->getNome() : null;
+        }
+
+        $pessoaTomador->getEnderecoLogradouro() ? $tomador["logradouro"] =  $pessoaTomador->getEnderecoLogradouro() : null;
+        $pessoaTomador->getEmail() ? $tomador["email"] =  $pessoaTomador->getEmail() : null;
+
+        if ($pessoaTomador->getEnderecoLogradouro()) {
+            $tomador["numero_residencia"] =  $pessoaTomador->getEnderecoNumero();
+            $pessoaTomador->getEnderecoComplemento() ? $tomador["complemento"] =  $pessoaTomador->getEnderecoComplemento() : null;
+            $tomador["bairro"] =  $pessoaTomador->getEnderecoBairro();
+            $tomador["cidade"] =  strtolower($pessoaTomador->getTipo()) == 'e' ? $pessoaTomador->getEnderecoCidade() : $pessoaTomador->getEnderecoCidadeCodigoTom();
+            $pessoaTomador->getEnderecoCep() ? $tomador["cep"] =  $pessoaTomador->getEnderecoCep() : null;
+        }
+
+        $itens = null;
+
+        for ($i = 0; $i <= 0; $i++) {
+
+            $item = null;
+            $item["tributa_municipio_prestador"] = $tributacaoMunicipioTomador;
+            $item["codigo_local_prestacao_servico"] = $tributacaoMunicipioTomador ? $pessoaTomador->getEnderecoCidadeCodigoTom() : $pessoaEmitente->getEnderecoCidadeCodigoTom();
+            // $item["unidade_codigo"=>"sr"
+            // $item["unidade_quantidade"=>1,
+            $valor ? $item["unidade_valor_unitario"] = $valor : null;
+            $item["codigo_item_lista_servico"] = $codigoSubitemListaServico;
+            $codigoAtividade ? $item["codigo_atividade"] = $codigoAtividade : null;
+            $item["descritivo"] = $descritivo;
+            $item["aliquota_item_lista_servico"] = $aliquota;
+            $item["situacao_tributaria"] = $situacaoTributaria;
+            $item["valor_tributavel"] = $valor;
+            $valorDeducao ? $item["valor_deducao"] = $valorDeducao : null;
+            $valorIssrf ? $item["valor_issrf"] = $valorIssrf : null;
+
+            $itens["lista" . $i] = $item;
+        }
 
         $nfse = [
             "nfse" => [
                 "identificador" => $id,
-                "nf" => [
-                    "serie_nfse" => $serie,
-                    "data_fato_gerador" => $data,
-                    "valor_total" => $valor,
-                    "valor_desconto" => $valorDesconto,
-                    "valor_ir" => $valorIr,
-                    "valor_inss" => $valorInss,
-                    "valor_contribuicao_social" => $valorContribuicaoSocial,
-                    "valor_rps" => $valorRps,
-                    "valor_pis" => $valorPis,
-                    "valor_cofins" => $valorCofins,
-                    "observacao" => $observacao
+                "rps" => [
+                    "nro_recibo_provisorio" => $nroRps,
+                    "serie_recibo_provisorio" => $serie,
+                    "data_emissao_recibo_provisorio" => date("d/m/Y"),
+                    "hora_emissao_recibo_provisorio" => date("H:i:s")
                 ],
+                "nf" => $nf,
                 "prestador" => [
-                    "cpfcnpj" => $this->getEmitente()->getCnpj(),
-                    "cidade" => $this->getEmitente()->getCidadeCodigoTom()
+                    "cpfcnpj" => $pessoaEmitente->getCnpj(),
+                    "cidade" => $pessoaEmitente->getEnderecoCidadeCodigoTom()
                 ],
-                "tomador" => [
-                    "endereco_informado" => $enderecoInformado,
-                    "tipo" => $fisicaJuridica, //F,J ou E (estrangeiro)
-                    // "identificador" => $documentoEstrangeiro,
-                    // "estado" => $estadoEstrangeiro,
-                    // "pais" => $paisEstrangeiro,
-                    "cpfcnpj" => $cpfCnpj,
-                    "ie" => $ie,
-                    "nome_razao_social" => $nomeRazaoSocial,
-                    "sobrenome_nome_fantasia" => $sobrenomeNomeFantasia,
-                    "logradouro" => $logradouro,
-                    "email" => $email,
-                    "numero_residencia" => $numeroResidencial,
-                    "complemento" => $complemento,
-                    "bairro" => $bairro,
-                    "cidade" => $cidadeCodigoTom,
-                    "cep" => $cep
-
-                ],
-                "itens" => [
-                    "lista" => [
-                        0 => [
-                            "tributa_municipio_prestador" => 1,
-                            "codigo_local_prestacao_servico" => $cidadeCodigoTom,
-                            // "unidade_codigo"=>"sr"
-                            // "unidade_quantidade"=>1,
-                            "unidade_valor_unitario" => $valor,
-                            "codigo_item_lista_servico" => $codigoSubitemListaServico,
-                            "codigo_atividade" => $codigoAtividade,
-                            "descritivo" => $descritivo,
-                            "aliquota_item_lista_servico" => $aliquota,
-                            "situacao_tributaria" => $situacaoTributaria,
-                            "valor_tributavel" => $valorTributavel,
-                            "valor_deducao" => $valorDeducao,
-                            "valor_issrf" => $valorIssrf
-                        ]
-                    ]
-                ]
+                "tomador" => $tomador,
+                "itens" => $itens
             ]
         ];
 
-        $this->xml = XML::createFromArray($nfse);
+        $this->xml = XML::createFromArray($nfse, '', ['lista']);
 
         // echo '<pre>';
         // var_dump($this->xml);

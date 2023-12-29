@@ -4,6 +4,7 @@ namespace DFe;
 
 use Entities\ConfiguracaoCidade;
 use Entities\Emitente;
+use Entities\Pessoa;
 use Exception;
 use Libraries\Constants;
 
@@ -11,12 +12,12 @@ class NFSe extends DFe
 {
     private NFSe $nfse;
 
-    public function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO, bool $calledByChild = false)
+    public function __construct(Emitente $emitente, Pessoa $tomador, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO, bool $calledByChild = false)
     {
-        $configuracaoCidade = ConfiguracaoCidade::getConfiguracaoCidade($emitente->getCidadeCodigoIbge());
+        $configuracaoCidade = ConfiguracaoCidade::getConfiguracaoCidade($emitente->getEnderecoCidadeCodigoIbge());
 
         if (!$configuracaoCidade) {
-            throw new Exception("Configuração para a cidade " . $emitente->getCidadeCodigoIbge() . " inexistente!");
+            throw new Exception("Configuração para a cidade " . $emitente->getEnderecoCidadeCodigoIbge() . " inexistente!");
         }
 
         if ($calledByChild) {
@@ -30,17 +31,15 @@ class NFSe extends DFe
                         "homologação") . " inexistente!");
             }
 
-            $emitente->setCidadeCodigoTom($configuracaoCidade->getCidadeCodigoTom());
-
             $this->setUrlWebservice(
                 Constants::AMBIENTE_PRODUCAO ?
                     $configuracaoCidade->getUrlWebserviceProducao() :
                     $configuracaoCidade->getUrlWebserviceHomologacao()
             );
 
-            parent::__construct($emitente, $ambiente);
+            parent::__construct($emitente, $tomador, $ambiente);
         } else {
-            $this->nfse = new ("DFe\\NFSe\\" . $configuracaoCidade->getClasseNFSe())($emitente, $ambiente, true);
+            $this->nfse = new ("DFe\\NFSe\\" . $configuracaoCidade->getClasseNFSe())($emitente, $tomador, $ambiente, true);
         }
     }
 

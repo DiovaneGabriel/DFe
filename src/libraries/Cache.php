@@ -21,7 +21,9 @@ class Cache
 
     public static function saveToCache($key, $data)
     {
-        mkdir(self::CACHE_DIR, 0777, true);
+        if (!is_dir(self::CACHE_DIR)) {
+            mkdir(self::CACHE_DIR, 0777, true);
+        }
 
         $cacheFile = self::CACHE_DIR . md5($key);
 
