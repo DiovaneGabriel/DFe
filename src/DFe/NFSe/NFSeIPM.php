@@ -2,6 +2,7 @@
 
 namespace DFe\NFSe;
 
+use DateTime;
 use DFe\NFSe;
 use Exception;
 use Libraries\Cache;
@@ -34,47 +35,23 @@ class NFSeIPM extends NFSe
         return $this->sendRequest();
     }
 
-    public function emitir()
+    public function emitir(): self
     {
-
         $pessoaEmitente = $this->getEmitente();
         $pessoaTomador = $this->getTomador();
 
-        $id = 123;
-        $nroRps = "123";
-        $serie = "1";
-        $data = "28/12/2023"; //TODO: criar formatador
-        $valor = 1;
-        $valorDesconto = 0;
-        $valorIr = 0;
-        $valorInss = 0;
-        $valorContribuicaoSocial = 0;
-        $valorRps = 0;
-        $valorPis = 0;
-        $valorCofins = 0;
-        $observacao = "";
-
-        $tributacaoMunicipioTomador = 0;
-        $codigoSubitemListaServico = '123';
-        $codigoAtividade = '123';
-        $descritivo = 'Prestação de serviço';
-        $aliquota = '2';
-        $situacaoTributaria = '0100';
-        $valorDeducao = '';
-        $valorIssrf = '';
-
         $nf = null;
-        $serie ? $nf["serie_nfse"] = $serie : null;
-        $data ? $nf["data_fato_gerador"] = $data : null;
-        $nf["valor_total"] = $valor;
-        $valorDesconto ? $nf["valor_desconto"] = $valorDesconto : null;
-        $valorIr ? $nf["valor_ir"] = $valorIr : null;
-        $valorInss ? $nf["valor_inss"] = $valorInss : null;
-        $valorContribuicaoSocial ? $nf["valor_contribuicao_social"] = $valorContribuicaoSocial : null;
-        $valorRps ? $nf["valor_rps"] = $valorRps : null;
-        $valorPis ? $nf["valor_pis"] = $valorPis : null;
-        $valorCofins ? $nf["valor_cofins"] = $valorCofins : null;
-        $observacao ? $nf["observacao"] = $observacao : null;
+        $this->getSerie() ? $nf["serie_nfse"] = $this->getSerie() : null;
+        $this->getDataFatoGerador() ? $nf["data_fato_gerador"] = $this->getDataFatoGerador()->format('d/m/Y') : null;
+        $nf["valor_total"] = $this->getValor();
+        $this->getValorDesconto() ? $nf["valor_desconto"] = $this->getValorDesconto() : null;
+        $this->getValorIr() ? $nf["valor_ir"] = $this->getValorIr() : null;
+        $this->getValorInss() ? $nf["valor_inss"] = $this->getValorInss() : null;
+        $this->getValorContribuicaoSocial() ? $nf["valor_contribuicao_social"] = $this->getValorContribuicaoSocial() : null;
+        $this->getValorRps() ? $nf["valor_rps"] = $this->getValorRps() : null;
+        $this->getValorPis() ? $nf["valor_pis"] = $this->getValorPis() : null;
+        $this->getValorCofins() ? $nf["valor_cofins"] = $this->getValorCofins() : null;
+        $this->getObservacao() ? $nf["observacao"] = $this->getObservacao() : null;
 
         $tomador = null;
         $tomador["endereco_informado"] = $pessoaTomador->getEnderecoLogradouro() ? 1 : 0;
@@ -110,32 +87,34 @@ class NFSeIPM extends NFSe
 
         $itens = null;
 
-        for ($i = 0; $i <= 0; $i++) {
+        $nfseItens = $this->getItens();
+
+        foreach ($nfseItens as $i => $nfseItem) {
 
             $item = null;
-            $item["tributa_municipio_prestador"] = $tributacaoMunicipioTomador;
-            $item["codigo_local_prestacao_servico"] = $tributacaoMunicipioTomador ? $pessoaTomador->getEnderecoCidadeCodigoTom() : $pessoaEmitente->getEnderecoCidadeCodigoTom();
+            $item["tributa_municipio_prestador"] = $nfseItem->getTributacaoMunicipioTomador();
+            $item["codigo_local_prestacao_servico"] = $nfseItem->getTributacaoMunicipioTomador() ? $pessoaTomador->getEnderecoCidadeCodigoTom() : $pessoaEmitente->getEnderecoCidadeCodigoTom();
             // $item["unidade_codigo"=>"sr"
             // $item["unidade_quantidade"=>1,
-            $valor ? $item["unidade_valor_unitario"] = $valor : null;
-            $item["codigo_item_lista_servico"] = $codigoSubitemListaServico;
-            $codigoAtividade ? $item["codigo_atividade"] = $codigoAtividade : null;
-            $item["descritivo"] = $descritivo;
-            $item["aliquota_item_lista_servico"] = $aliquota;
-            $item["situacao_tributaria"] = $situacaoTributaria;
-            $item["valor_tributavel"] = $valor;
-            $valorDeducao ? $item["valor_deducao"] = $valorDeducao : null;
-            $valorIssrf ? $item["valor_issrf"] = $valorIssrf : null;
+            $nfseItem->getValor() ? $item["unidade_valor_unitario"] = $nfseItem->getValor() : null;
+            $item["codigo_item_lista_servico"] = $nfseItem->getCodigo();
+            $nfseItem->getCodigoAtividade() ? $item["codigo_atividade"] = $nfseItem->getCodigoAtividade() : null;
+            $item["descritivo"] = $nfseItem->getDescricao();
+            $item["aliquota_item_lista_servico"] = $nfseItem->getAliquota();
+            $item["situacao_tributaria"] = $nfseItem->getSituacaoTributaria();
+            $item["valor_tributavel"] = $nfseItem->getValorTributavel();
+            $nfseItem->getValorDeducao() ? $item["valor_deducao"] = $nfseItem->getValorDeducao() : null;
+            $nfseItem->getValorIssrf() ? $item["valor_issrf"] = $nfseItem->getValorIssrf() : null;
 
             $itens["lista" . $i] = $item;
         }
 
         $nfse = [
             "nfse" => [
-                "identificador" => $id,
+                // "identificador" => $id,
                 "rps" => [
-                    "nro_recibo_provisorio" => $nroRps,
-                    "serie_recibo_provisorio" => $serie,
+                    "nro_recibo_provisorio" => $this->getNumeroRps(),
+                    "serie_recibo_provisorio" => $this->getSerie(),
                     "data_emissao_recibo_provisorio" => date("d/m/Y"),
                     "hora_emissao_recibo_provisorio" => date("H:i:s")
                 ],
@@ -151,11 +130,16 @@ class NFSeIPM extends NFSe
 
         $this->xml = XML::createFromArray($nfse, '', ['lista']);
 
-        // echo '<pre>';
-        // var_dump($this->xml);
-        // die();
+        if ($response = $this->sendRequest()) {
+            $xmlResponse = simplexml_load_string($response);
 
-        return $this->sendRequest();
+            $this->setNumero(((array)$xmlResponse->numero_nfse)[0]);
+            $this->setDataEmissao(DateTime::createFromFormat('d/m/Y H:i:s',((array)$xmlResponse->data_nfse)[0] . " " . ((array)$xmlResponse->hora_nfse)[0]));
+            $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
+            $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
+        }
+
+        return $this;
     }
 
     private function sendRequest()
@@ -190,7 +174,10 @@ class NFSeIPM extends NFSe
             }
         }
 
-        return self::decodeResponse($response);
+        if (self::decodeResponse($response)) {
+            return $response->return;
+        }
+        return false;
     }
 
     private static function decodeResponse($response)
