@@ -19,7 +19,7 @@ class Format
         }
         return $masked;
     }
-    
+
     public static function cnpj($cnpj)
     {
         if (!$cnpj) {
@@ -31,5 +31,10 @@ class Format
         $masked = self::mask($cnpj, '##.###.###/####-##');
 
         return $masked;
+    }
+
+    public static function floatWithComa(float $value): string
+    {
+        return str_replace(".", ",", $value);
     }
 }

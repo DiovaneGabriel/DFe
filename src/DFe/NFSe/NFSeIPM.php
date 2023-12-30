@@ -15,12 +15,37 @@ use Libraries\XML;
 
 class NFSeIPM extends NFSe
 {
+
+    public function consultar(string $protocoloAutorizacao = null)
+    {
+        $protocoloAutorizacao ? $this->setProtocoloAutorizacao($protocoloAutorizacao) : null;
+
+        $xml = [
+            "nfse" => [
+                "pesquisa" => [
+                    "codigo_autenticidade" => $this->getProtocoloAutorizacao()
+                ]
+            ]
+        ];
+
+        $this->setXml(XML::createFromArray($xml));
+
+        if ($response = $this->sendRequest()) {
+            $response = preg_replace('/>\s+</', '><', $response);
+            $response = mb_convert_encoding($response, 'UTF-8', mb_detect_encoding($response, 'UTF-8, ISO-8859-1', true));
+
+            $this->setXml($response);
+        }
+
+        return $this;
+    }
+
     public function cancelar(string $motivo, int $numero = null, int $serie = null)
     {
         $numero ? $this->setNumero($numero) : null;
         $serie ? $this->setSerie($serie) : null;
 
-        $nfse = [
+        $xml = [
             "nfse" =>
             [
                 "nf" => [
@@ -36,19 +61,20 @@ class NFSeIPM extends NFSe
             ]
         ];
 
-        $this->xml = XML::createFromArray($nfse);
+        $this->setXml(XML::createFromArray($xml));
 
         if ($this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO) {
             $this->setDataCancelamento($this->getEmitente()->getLocalDateTime());
             $this->setSituacao(Constants::SITUACAO_CANCELADO);
         } else {
             if ($response = $this->sendRequest()) {
-                // $xmlResponse = simplexml_load_string($response);
+                $xmlResponse = simplexml_load_string($response);
 
                 $this->setDataCancelamento($this->getEmitente()->getLocalDateTime());
-                // $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
-                // $this->setProtocoloCancelamento(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
+                $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
                 $this->setSituacao(Constants::SITUACAO_CANCELADO);
+
+                $this->consultar();
             }
         }
 
@@ -58,30 +84,67 @@ class NFSeIPM extends NFSe
     public function emitir(): self
     {
         $pessoaEmitente = $this->getEmitente();
-        $pessoaTomador = $this->getTomador();
 
+        $xml = null;
+
+        $this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO ? $xml["nfse_teste"] = 1 : null;
+
+        $xml["rps"] = [
+            "nro_recibo_provisorio" => $this->getNumeroRps(),
+            "serie_recibo_provisorio" => $this->getSerie(),
+            "data_emissao_recibo_provisorio" => $pessoaEmitente->getLocalDateTime()->format("d/m/Y"),
+            "hora_emissao_recibo_provisorio" => $pessoaEmitente->getLocalDateTime()->format("H:i:s")
+        ];
+        $xml["nf"] = $this->buildTagNf();
+        $xml["prestador"] = [
+            "cpfcnpj" => $pessoaEmitente->getCnpj(),
+            "cidade" => $pessoaEmitente->getEnderecoCidadeCodigoTom()
+        ];
+        $xml["tomador"] = $this->buildTagTomador();
+        $xml["itens"] = $this->buildTagItens();
+
+        $this->setXml(XML::createFromArray([$xml], 'nfse', ['lista']));
+
+        if ($response = $this->sendRequest()) {
+            $xmlResponse = simplexml_load_string($response);
+
+            $this->setNumero(((array)$xmlResponse->numero_nfse)[0]);
+            $this->setDataEmissao(DateTime::createFromFormat('d/m/Y H:i:s', ((array)$xmlResponse->data_nfse)[0] . " " . ((array)$xmlResponse->hora_nfse)[0]));
+            $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
+            $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
+            $this->setSituacao(Constants::SITUACAO_EMITIDO);
+
+            $this->consultar();
+        }
+
+        return $this;
+    }
+
+    private function buildTagNf(): array
+    {
         $nf = null;
         $this->getSerie() ? $nf["serie_nfse"] = $this->getSerie() : null;
         $this->getDataFatoGerador() ? $nf["data_fato_gerador"] = $this->getDataFatoGerador()->format('d/m/Y') : null;
-        $nf["valor_total"] = $this->getValor();
-        $this->getValorDesconto() ? $nf["valor_desconto"] = $this->getValorDesconto() : null;
-        $this->getValorIr() ? $nf["valor_ir"] = $this->getValorIr() : null;
-        $this->getValorInss() ? $nf["valor_inss"] = $this->getValorInss() : null;
-        $this->getValorContribuicaoSocial() ? $nf["valor_contribuicao_social"] = $this->getValorContribuicaoSocial() : null;
-        $this->getValorRps() ? $nf["valor_rps"] = $this->getValorRps() : null;
-        $this->getValorPis() ? $nf["valor_pis"] = $this->getValorPis() : null;
-        $this->getValorCofins() ? $nf["valor_cofins"] = $this->getValorCofins() : null;
-        $this->getObservacao() ? $nf["observacao"] = $this->getObservacao() : null;
+        $nf["valor_total"] = Format::floatWithComa($this->getValor());
+        $this->getValorDesconto() ? $nf["valor_desconto"] = Format::floatWithComa($this->getValorDesconto()) : null;
+        $this->getValorIr() ? $nf["valor_ir"] = Format::floatWithComa($this->getValorIr()) : null;
+        $this->getValorInss() ? $nf["valor_inss"] = Format::floatWithComa($this->getValorInss()) : null;
+        $this->getValorContribuicaoSocial() ? $nf["valor_contribuicao_social"] = Format::floatWithComa($this->getValorContribuicaoSocial()) : null;
+        $this->getValorRps() ? $nf["valor_rps"] = Format::floatWithComa($this->getValorRps()) : null;
+        $this->getValorPis() ? $nf["valor_pis"] = Format::floatWithComa($this->getValorPis()) : null;
+        $this->getValorCofins() ? $nf["valor_cofins"] = Format::floatWithComa($this->getValorCofins()) : null;
+        $this->getObservacao() ? $nf["observacao"] = Format::floatWithComa($this->getObservacao()) : null;
+
+        return $nf;
+    }
+
+    private function buildTagTomador(): array
+    {
+        $pessoaTomador = $this->getTomador();
 
         $tomador = null;
         $tomador["endereco_informado"] = $pessoaTomador->getEnderecoLogradouro() ? 1 : 0;
         $tomador["tipo"] = strtoupper($pessoaTomador->getTipo());
-
-        if (strtolower($pessoaTomador->getTipo()) == 'e') {
-            $pessoaTomador->getDocumentoEstrangeiro() ? $tomador["identificador"] = $pessoaTomador->getDocumentoEstrangeiro() : null;
-            $pessoaTomador->getEnderecoEstado() ? $tomador["estado"] = $pessoaTomador->getEnderecoEstado() : null;
-            $pessoaTomador->getEnderecoPais() ? $tomador["pais"] = $pessoaTomador->getEnderecoPais() : null;
-        }
 
         if (strtolower($pessoaTomador->getTipo()) == 'f') {
             $pessoaTomador->getCpf() ? $tomador["cpfcnpj"] =  $pessoaTomador->getCpf() : null;
@@ -91,6 +154,11 @@ class NFSeIPM extends NFSe
             $pessoaTomador->getInscricaoEstadual() ? $tomador["ie"] =  $pessoaTomador->getInscricaoEstadual() : null;
             $pessoaTomador->getRazaoSocial() ? $tomador["nome_razao_social"] =  $pessoaTomador->getRazaoSocial() : null;
             $pessoaTomador->getNome() ? $tomador["sobrenome_nome_fantasia"] =  $pessoaTomador->getNome() : null;
+        } elseif (strtolower($pessoaTomador->getTipo()) == 'e') {
+            $pessoaTomador->getDocumentoEstrangeiro() ? $tomador["identificador"] = $pessoaTomador->getDocumentoEstrangeiro() : null;
+            $pessoaTomador->getEnderecoEstado() ? $tomador["estado"] = $pessoaTomador->getEnderecoEstado() : null;
+            $pessoaTomador->getEnderecoPais() ? $tomador["pais"] = $pessoaTomador->getEnderecoPais() : null;
+            $pessoaTomador->getNome() ? $tomador["nome_razao_social"] =  $pessoaTomador->getNome() : null;
         }
 
         $pessoaTomador->getEnderecoLogradouro() ? $tomador["logradouro"] =  $pessoaTomador->getEnderecoLogradouro() : null;
@@ -104,9 +172,17 @@ class NFSeIPM extends NFSe
             $pessoaTomador->getEnderecoCep() ? $tomador["cep"] =  $pessoaTomador->getEnderecoCep() : null;
         }
 
-        $itens = null;
+        return $tomador;
+    }
+
+    private function buildTagItens(): array
+    {
+        $pessoaEmitente = $this->getEmitente();
+        $pessoaTomador = $this->getTomador();
 
         $nfseItens = $this->getItens();
+
+        $itens = null;
 
         foreach ($nfseItens as $i => $nfseItem) {
 
@@ -115,50 +191,20 @@ class NFSeIPM extends NFSe
             $item["codigo_local_prestacao_servico"] = $nfseItem->getTributacaoMunicipioTomador() ? $pessoaTomador->getEnderecoCidadeCodigoTom() : $pessoaEmitente->getEnderecoCidadeCodigoTom();
             // $item["unidade_codigo"=>"sr"
             // $item["unidade_quantidade"=>1,
-            $nfseItem->getValor() ? $item["unidade_valor_unitario"] = $nfseItem->getValor() : null;
+            $nfseItem->getValor() ? $item["unidade_valor_unitario"] = Format::floatWithComa($nfseItem->getValor()) : null;
             $item["codigo_item_lista_servico"] = $nfseItem->getCodigo();
             $nfseItem->getCodigoAtividade() ? $item["codigo_atividade"] = $nfseItem->getCodigoAtividade() : null;
             $item["descritivo"] = $nfseItem->getDescricao();
             $item["aliquota_item_lista_servico"] = $nfseItem->getAliquota();
             $item["situacao_tributaria"] = $nfseItem->getSituacaoTributaria();
-            $item["valor_tributavel"] = $nfseItem->getValorTributavel();
-            $nfseItem->getValorDeducao() ? $item["valor_deducao"] = $nfseItem->getValorDeducao() : null;
-            $nfseItem->getValorIssrf() ? $item["valor_issrf"] = $nfseItem->getValorIssrf() : null;
+            $item["valor_tributavel"] = Format::floatWithComa($nfseItem->getValorTributavel());
+            $nfseItem->getValorDeducao() ? $item["valor_deducao"] = Format::floatWithComa($nfseItem->getValorDeducao()) : null;
+            $nfseItem->getValorIssrf() ? $item["valor_issrf"] = Format::floatWithComa($nfseItem->getValorIssrf()) : null;
 
             $itens["lista" . $i] = $item;
         }
 
-        $nfse = null;
-
-        $this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO ? $nfse["nfse_teste"] = 1 : null;
-
-        $nfse["rps"] = [
-            "nro_recibo_provisorio" => $this->getNumeroRps(),
-            "serie_recibo_provisorio" => $this->getSerie(),
-            "data_emissao_recibo_provisorio" => $pessoaEmitente->getLocalDateTime()->format("d/m/Y"),
-            "hora_emissao_recibo_provisorio" => $pessoaEmitente->getLocalDateTime()->format("H:i:s")
-        ];
-        $nfse["nf"] = $nf;
-        $nfse["prestador"] = [
-            "cpfcnpj" => $pessoaEmitente->getCnpj(),
-            "cidade" => $pessoaEmitente->getEnderecoCidadeCodigoTom()
-        ];
-        $nfse["tomador"] = $tomador;
-        $nfse["itens"] = $itens;
-
-        $this->xml = XML::createFromArray([$nfse], 'nfse', ['lista']);
-
-        if ($response = $this->sendRequest()) {
-            $xmlResponse = simplexml_load_string($response);
-
-            $this->setNumero(((array)$xmlResponse->numero_nfse)[0]);
-            $this->setDataEmissao(DateTime::createFromFormat('d/m/Y H:i:s', ((array)$xmlResponse->data_nfse)[0] . " " . ((array)$xmlResponse->hora_nfse)[0]));
-            $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
-            $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
-            $this->setSituacao(Constants::SITUACAO_EMITIDO);
-        }
-
-        return $this;
+        return $itens;
     }
 
     private function sendRequest()
@@ -180,7 +226,7 @@ class NFSeIPM extends NFSe
         # cria arquivo temporario
         $tempFile = tempnam(sys_get_temp_dir(), $this->getEmitente()->getCnpj() . '_');
         $file = fopen($tempFile, 'w');
-        fwrite($file, $this->xml);
+        fwrite($file, $this->getXml());
         fclose($file);
 
         $fileName = curl_file_create($tempFile, 'text/xml', 'arquivo');
@@ -212,9 +258,7 @@ class NFSeIPM extends NFSe
                 if (!empty($obj->mensagem->codigo)) {
                     $codigo = substr(((array)$obj->mensagem->codigo)[0], 0, 5);
 
-                    if ($codigo == '00001') {
-                        return true;
-                    } else {
+                    if ($codigo != '00001') {
                         throw new NFSeIPMException((array)$obj->mensagem->codigo);
                     }
                 }
@@ -228,6 +272,8 @@ class NFSeIPM extends NFSe
         } else {
             throw new Exception($response->return);
         }
+
+        return true;
     }
 
     private static function getCookie($response)

@@ -12,6 +12,20 @@ $emitente = new Emitente("DB Serviços de Informações Ltda", 4319901, "5194198
 $emitente->setEnderecoCidadeCodigoTom("8899");
 
 $tomador = new Pessoa("Diovane Barbieri Gabriel");
+
+// $tomador
+//     ->setTipo('E')
+//     ->setDocumentoEstrangeiro('BRBDVN92E01Z602Q')
+//     ->setEnderecoCep("16030")
+//     ->setEnderecoCidade("Moneglia")
+//     ->setEnderecoEstado("Liguria")
+//     ->setEnderecoPais("Italia")
+//     ->setEnderecoBairro("Roverano Basso")
+//     ->setEnderecoLogradouro("Via Casale")
+//     ->setEnderecoNumero("37")
+//     ->setEnderecoComplemento("Q")
+//     ->setEmail("diovane.gabriel@gmail.com");
+
 $tomador
     ->setTipo('F')
     ->setCpf('83532226049')
@@ -23,7 +37,7 @@ $tomador
     ->setEnderecoCidadeCodigoTom("8899")
     ->setEnderecoCep("93800126");
 
-$nfse = NFSe::getInstance($emitente, Constants::AMBIENTE_PRODUCAO);
+$nfse = NFSe::getInstance($emitente, Constants::AMBIENTE_HOMOLOGACAO);
 $nfse
     ->setTomador($tomador)
     ->setSerie(1);
@@ -34,15 +48,16 @@ $nfseItem
     ->setCodigo("1701")
     ->setAliquota(2)
     ->setSituacaoTributaria(0)
-    ->setValorTributavel(1)
-    ->setValor(1);
+    ->setValorTributavel(1.2)
+    ->setValor(1.2);
 
-$nfse->setNumeroRps(18)
-    ->setValor(1)
-    ->addItem($nfseItem)
-    ->emitir();
+// $nfse->setNumeroRps(21)
+//     ->setValor(1.2)
+//     ->addItem($nfseItem)
+//     ->emitir();
 
-$nfse->cancelar("NFS-e emitida para teste");
+// $nfse->cancelar("NFS-e emitida para teste");
+$nfse->consultar("8899738882205194198620241229122023253915");
 
 echo '<pre>';
 var_dump($nfse);

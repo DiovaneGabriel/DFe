@@ -8,7 +8,6 @@ use Libraries\Constants;
 
 abstract class DFe
 {
-    protected $xml;
 
     private int $ambiente;
     private Emitente $emitente;
@@ -22,6 +21,7 @@ abstract class DFe
     private float $valorCofins = 0;
     private float $valorDesconto = 0;
     private float $valorPis = 0;
+    private string $xml = "";
 
     private ?DateTime $dataEmissao = null;
     private ?DateTime $dataCancelamento = null;

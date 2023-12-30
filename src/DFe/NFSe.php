@@ -22,6 +22,8 @@ abstract class NFSe extends DFe
     private ?DateTime $dataFatoGerador = null;
     private ?Pessoa $tomador = null;
 
+    abstract public function consultar(string $protocoloAutorizacao = null);
+
     public static function getInstance(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO): NFSe
     {
         $className = Parameters::getClasseNFSeFromCidade($emitente->getEnderecoCidadeCodigoIbge());
