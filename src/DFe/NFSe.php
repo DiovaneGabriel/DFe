@@ -30,7 +30,7 @@ class NFSe extends DFe
         // $this->setAmbiente($ambiente);
         $this->itens = [];
 
-        $this->setDataFatoGerador(new DateTime());
+        $this->setDataFatoGerador($this->getEmitente()->getLocalDateTime());
         $this->setNumeroRps(0);
         $this->setProtocoloAutorizacao('');
         $this->setUrlDanfse('');
@@ -80,10 +80,10 @@ class NFSe extends DFe
         return $child;
     }
 
-    public function cancelar(int $numero, int $serie, string $motivo)
+    public function cancelar(string $motivo, int $numero = null, int $serie = null)
     {
         $nfse = $this->procreate();
-        return $nfse->cancelar($numero, $serie, $motivo);
+        return $nfse->cancelar($motivo, $numero, $serie);
     }
 
     public function emitir()

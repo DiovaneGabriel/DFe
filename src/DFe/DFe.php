@@ -3,8 +3,11 @@
 namespace DFe;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeZone;
 use Entities\ConfiguracaoCidade;
 use Entities\Emitente;
+use Entities\Parameters;
 use Entities\Pessoa;
 use Exception;
 use Libraries\Constants;
@@ -29,18 +32,16 @@ abstract class DFe
     private float $valorDesconto;
     private float $valorPis;
 
-    abstract public function cancelar(int $numero, int $serie, string $motivo);
+    abstract public function cancelar(string $motivo, int $numero = null, int $serie = null);
     abstract public function emitir();
 
     function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO)
     {
-        date_default_timezone_set('Etc/GMT+3');
-
         $this->emitente = $emitente;
 
         $this->setAmbiente($ambiente);
-        $this->setDataEmissao(new DateTime());
-        $this->setDataCancelamento(new DateTime());
+        $this->setDataEmissao($this->getEmitente()->getLocalDateTime());
+        $this->setDataCancelamento($this->getEmitente()->getLocalDateTime());
         $this->setNumero(0);
         $this->setProtocoloAutorizacao('');
         $this->setProtocoloCancelamento('');

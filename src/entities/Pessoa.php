@@ -2,6 +2,10 @@
 
 namespace Entities;
 
+use DateTime;
+use DateTimeImmutable;
+use DateTimeZone;
+
 class Pessoa
 {
     private string $cnpj;
@@ -26,6 +30,18 @@ class Pessoa
     function __construct($nome)
     {
         $this->nome = $nome;
+    }
+
+    public function getLocalDateTime(): DateTime
+    {
+        if (!$this->getEnderecoCidadeCodigoIbge()) {
+            return null;
+        }
+
+        $timeZone = new DateTimeZone(Parameters::getFusoHorarioFromCidade($this->getEnderecoCidadeCodigoIbge()));
+        $currentDateTime = new DateTimeImmutable('now', $timeZone);
+
+        return new DateTime($currentDateTime->format('Y-m-d H:i:s'));
     }
 
     /**

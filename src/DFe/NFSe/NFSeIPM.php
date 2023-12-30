@@ -15,15 +15,17 @@ use Libraries\XML;
 
 class NFSeIPM extends NFSe
 {
-    public function cancelar(int $numero, int $serie, string $motivo)
+    public function cancelar(string $motivo, int $numero = null, int $serie = null)
     {
+        $numero ? $this->setNumero($numero) : null;
+        $serie ? $this->setSerie($serie) : null;
 
         $nfse = [
             "nfse" =>
             [
                 "nf" => [
-                    "numero" => $numero,
-                    "serie_nfse" => $serie,
+                    "numero" => $this->getNumero(),
+                    "serie_nfse" => $this->getSerie(),
                     "situacao" => "C",
                     "observacao" => $motivo
                 ],
@@ -37,13 +39,13 @@ class NFSeIPM extends NFSe
         $this->xml = XML::createFromArray($nfse);
 
         if ($this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO) {
-            $this->setDataCancelamento(new DateTime(date("Y-m-d H:i:s")));
+            $this->setDataCancelamento($this->getEmitente()->getLocalDateTime());
             $this->setSituacao(Constants::SITUACAO_CANCELADO);
         } else {
             if ($response = $this->sendRequest()) {
                 // $xmlResponse = simplexml_load_string($response);
 
-                $this->setDataCancelamento(new DateTime(date("Y-m-d H:i:s")));
+                $this->setDataCancelamento($this->getEmitente()->getLocalDateTime());
                 // $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
                 // $this->setProtocoloCancelamento(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
                 $this->setSituacao(Constants::SITUACAO_CANCELADO);
@@ -133,8 +135,8 @@ class NFSeIPM extends NFSe
         $nfse["rps"] = [
             "nro_recibo_provisorio" => $this->getNumeroRps(),
             "serie_recibo_provisorio" => $this->getSerie(),
-            "data_emissao_recibo_provisorio" => date("d/m/Y"),
-            "hora_emissao_recibo_provisorio" => date("H:i:s")
+            "data_emissao_recibo_provisorio" => $pessoaEmitente->getLocalDateTime()->format("d/m/Y"),
+            "hora_emissao_recibo_provisorio" => $pessoaEmitente->getLocalDateTime()->format("H:i:s")
         ];
         $nfse["nf"] = $nf;
         $nfse["prestador"] = [

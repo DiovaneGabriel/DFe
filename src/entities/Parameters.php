@@ -18,6 +18,10 @@ class Parameters
         ]
     ];
 
+    private const DFE_FUSO_HORARIO_ESTADO = [
+        "America/Sao_Paulo" => ["43"]
+    ];
+
     public static function getClasseNFSeFromCidade(string $cidadeCodigoIbge): string
     {
         foreach (self::NFSE_CLASSE_CIDADE as $classe => $cidades) {
@@ -36,5 +40,16 @@ class Parameters
         }
 
         return self::NFSE_ENDPOINT_CIDADE[$cidadeCodigoIbge][$ambiente];
+    }
+
+    public static function getFusoHorarioFromCidade(string $cidadeCodigoIbge): string
+    {
+        foreach (self::DFE_FUSO_HORARIO_ESTADO as $fuso => $estados) {
+            if (in_array(substr($cidadeCodigoIbge, 0, 2), $estados)) {
+                return $fuso;
+            }
+        }
+
+        throw new Exception("Parametrização de fuso horário inexistente para a cidade " . $cidadeCodigoIbge . "!");
     }
 }
