@@ -20,7 +20,6 @@ abstract class DFe
     private Emitente $emitente;
     private string $observacao;
     private string $serie;
-    private string $urlWebservice;
     private int $numero;
     private string $protocoloAutorizacao;
     private string $protocoloCancelamento;
@@ -35,6 +34,8 @@ abstract class DFe
 
     function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO)
     {
+        date_default_timezone_set('Etc/GMT+3');
+
         $this->emitente = $emitente;
 
         $this->setAmbiente($ambiente);
@@ -84,24 +85,6 @@ abstract class DFe
     public function setEmitente(Emitente $emitente): self
     {
         $this->emitente = $emitente;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of urlWebservice
-     */
-    public function getUrlWebservice(): string
-    {
-        return $this->urlWebservice;
-    }
-
-    /**
-     * Set the value of urlWebservice
-     */
-    public function setUrlWebservice(string $urlWebservice): self
-    {
-        $this->urlWebservice = $urlWebservice;
 
         return $this;
     }

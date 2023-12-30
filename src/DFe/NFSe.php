@@ -3,9 +3,9 @@
 namespace DFe;
 
 use DateTime;
-use Entities\ConfiguracaoCidade;
 use Entities\Emitente;
 use Entities\NFSeItem;
+use Entities\Parameters;
 use Entities\Pessoa;
 use Exception;
 use Libraries\Constants;
@@ -13,7 +13,6 @@ use ReflectionMethod;
 
 class NFSe extends DFe
 {
-    private string $classeNFSe;
     private DateTime $dataFatoGerador;
     private array $itens;
     private int $numeroRps;
@@ -48,37 +47,11 @@ class NFSe extends DFe
         // }
     }
 
-    public function setEmitente(Emitente $emitente): self
-    {
-        $configuracaoCidade = ConfiguracaoCidade::getConfiguracaoCidade($emitente->getEnderecoCidadeCodigoIbge());
-
-        if (!$configuracaoCidade) {
-            throw new Exception("Configuração para a cidade " . $emitente->getEnderecoCidadeCodigoIbge() . " inexistente!");
-        }
-
-        if (
-            ($this->getAmbiente() == Constants::AMBIENTE_PRODUCAO && !$configuracaoCidade->getUrlWebserviceProducao()) ||
-            ($this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO && !$configuracaoCidade->getUrlWebserviceHomologacao())
-        ) {
-            throw new Exception("Url do ambiente de " .
-                ($this->getAmbiente() == Constants::AMBIENTE_PRODUCAO ?
-                    "produção" :
-                    "homologação") . " inexistente!");
-        }
-
-        $this->setClasseNFSe($configuracaoCidade->getClasseNFSe());
-        $this->setUrlWebservice(
-            $this->getAmbiente() == Constants::AMBIENTE_PRODUCAO ?
-                $configuracaoCidade->getUrlWebserviceProducao() :
-                $configuracaoCidade->getUrlWebserviceHomologacao()
-        );
-
-        return $this;
-    }
-
     private function procreate(): NFSe
     {
-        $child = new ("DFe\\NFSe\\" . $this->getClasseNFSe())($this->getEmitente(), $this->getAmbiente());
+        $className = Parameters::getClasseNFSeFromCidade($this->getEmitente()->getEnderecoCidadeCodigoIbge());
+
+        $child = new $className($this->getEmitente(), $this->getAmbiente());
 
         $parentMethods = get_class_methods($this);
         $parentMethods = array_filter($parentMethods, function ($method) {
@@ -117,24 +90,6 @@ class NFSe extends DFe
     {
         $nfse = $this->procreate();
         return $nfse->emitir();
-    }
-
-    /**
-     * Get the value of classeNFSe
-     */
-    public function getClasseNFSe(): string
-    {
-        return $this->classeNFSe;
-    }
-
-    /**
-     * Set the value of classeNFSe
-     */
-    public function setClasseNFSe(string $classeNFSe): self
-    {
-        $this->classeNFSe = $classeNFSe;
-
-        return $this;
     }
 
     /**

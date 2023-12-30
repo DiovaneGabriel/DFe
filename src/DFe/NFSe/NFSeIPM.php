@@ -3,7 +3,9 @@
 namespace DFe\NFSe;
 
 use DateTime;
+use DFe\DFeException\NFSeIPMException;
 use DFe\NFSe;
+use Entities\Parameters;
 use Exception;
 use Libraries\Cache;
 use Libraries\Constants;
@@ -15,6 +17,7 @@ class NFSeIPM extends NFSe
 {
     public function cancelar(int $numero, int $serie, string $motivo)
     {
+
         $nfse = [
             "nfse" =>
             [
@@ -33,13 +36,18 @@ class NFSeIPM extends NFSe
 
         $this->xml = XML::createFromArray($nfse);
 
-        if ($response = $this->sendRequest()) {
-            $xmlResponse = simplexml_load_string($response);
-
+        if ($this->getAmbiente() == Constants::AMBIENTE_HOMOLOGACAO) {
             $this->setDataCancelamento(new DateTime(date("Y-m-d H:i:s")));
-            // $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
-            // $this->setProtocoloCancelamento(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
             $this->setSituacao(Constants::SITUACAO_CANCELADO);
+        } else {
+            if ($response = $this->sendRequest()) {
+                // $xmlResponse = simplexml_load_string($response);
+
+                $this->setDataCancelamento(new DateTime(date("Y-m-d H:i:s")));
+                // $this->setUrlDanfse(((array)$xmlResponse->link_nfse)[0]);
+                // $this->setProtocoloCancelamento(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
+                $this->setSituacao(Constants::SITUACAO_CANCELADO);
+            }
         }
 
         return $this;
@@ -153,6 +161,8 @@ class NFSeIPM extends NFSe
 
     private function sendRequest()
     {
+        $endpoint = Parameters::getEndpointFromCidade($this->getEmitente()->getEnderecoCidadeCodigoIbge(), $this->getAmbiente());
+
         $cookieCacheKey = "cookieNFSeIPM" . $this->getEmitente()->getCnpj();
         $auth = base64_encode(Format::cnpj($this->getEmitente()->getCnpj()) . ':' . $this->getEmitente()->getSenhaWebservice());
         $cookie = Cache::getFromCache($cookieCacheKey);
@@ -172,7 +182,8 @@ class NFSeIPM extends NFSe
         fclose($file);
 
         $fileName = curl_file_create($tempFile, 'text/xml', 'arquivo');
-        $response = Request::post($this->getUrlWebservice(), ['xml' => $fileName], $headers, TRUE);
+
+        $response = Request::post($endpoint, ['xml' => $fileName], $headers, TRUE);
 
         unlink($tempFile);
 
@@ -183,30 +194,33 @@ class NFSeIPM extends NFSe
             }
         }
 
-        if (self::decodeResponse($response)) {
+        if ($this->decodeResponse($response)) {
             return $response->return;
         }
         return false;
     }
 
-    private static function decodeResponse($response)
+    private function decodeResponse($response)
     {
         if ($response->code == 200) {
             $response = $response->return;
             $obj = simplexml_load_string($response);
 
-            if (!empty($obj->mensagem->codigo)) {
-                $codigo = substr(((array)$obj->mensagem->codigo)[0], 0, 5);
+            if ($this->getAmbiente() == Constants::AMBIENTE_PRODUCAO) {
+                if (!empty($obj->mensagem->codigo)) {
+                    $codigo = substr(((array)$obj->mensagem->codigo)[0], 0, 5);
 
-                if ($codigo == '00001') {
+                    if ($codigo == '00001') {
+                        return true;
+                    } else {
+                        throw new NFSeIPMException((array)$obj->mensagem->codigo);
+                    }
+                }
+            } else {
+                if (!empty($obj->situacao_descricao_nfse)) {
                     return true;
                 } else {
-                    $mensagem = "";
-                    foreach ((array)$obj->mensagem->codigo as $i => $m) {
-                        $mensagem .= ($i > 0 ? "\n" : '') . trim($m);
-                    }
-
-                    throw new Exception($mensagem);
+                    throw new NFSeIPMException((array)$obj->mensagem->codigo);
                 }
             }
         } else {

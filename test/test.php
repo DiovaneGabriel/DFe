@@ -35,20 +35,16 @@ $nfseItem
     ->setValorTributavel(1)
     ->setValor(1);
 
-// echo '<pre>';
-// var_dump(new DateTime());
-// die();
-
 $nfse
-    ->setNumeroRps(13)
+    ->setNumeroRps(14)
     ->setSerie(1)
-    ->setDataFatoGerador(new DateTime(date("Y-m-d H:i:s")))
+    ->setDataFatoGerador(new DateTime(date("Y-m-01 H:i:s")))
     ->setValor(1)
     ->addItem($nfseItem);
 
-$nfse = $nfse->emitir();
+// $nfse = $nfse->emitir();
 
-// $nfse = $nfse->cancelar(15, $nfse->getSerie(), "NFS-e emitida para teste");
+$nfse = $nfse->cancelar(18, $nfse->getSerie(), "NFS-e emitida para teste");
 
 echo '<pre>';
 var_dump($nfse);

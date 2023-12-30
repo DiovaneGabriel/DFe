@@ -2,7 +2,10 @@
     "name": "diovanegabriel/dfe",
     "description": "Integração com documentos fiscais eletronicos",
     "type": "library",
-    "keywords": ["DF-e","NFS-e"],
+    "keywords": [
+        "DF-e",
+        "NFS-e"
+    ],
     "license": "MIT",
     "version": "v1.0.0",
     "authors": [
@@ -12,9 +15,10 @@
     ],
     "autoload": {
         "psr-4": {
-            "Libraries\\": "src/libraries/",
+            "DFe\\": "src/DFe/",
+            "DFeException\\": "src/DFe/DFeException",
             "Entities\\": "src/entities/",
-            "DFe\\": "src/DFe/"
+            "Libraries\\": "src/libraries/"
         }
     }
 }
