@@ -7,105 +7,52 @@ use Entities\Emitente;
 use Entities\NFSeItem;
 use Entities\Parameters;
 use Entities\Pessoa;
-use Exception;
 use Libraries\Constants;
-use ReflectionMethod;
 
-class NFSe extends DFe
+abstract class NFSe extends DFe
 {
-    private DateTime $dataFatoGerador;
-    private array $itens;
-    private int $numeroRps;
-    private Pessoa $tomador;
-    private string $urlDanfse;
-    private float $valorContribuicaoSocial;
-    private float $valorInss;
-    private float $valorIr;
-    private float $valorRps;
+    private array $itens = [];
+    private int $numeroRps = 0;
+    private string $urlDanfse = "";
+    private float $valorContribuicaoSocial = 0;
+    private float $valorInss = 0;
+    private float $valorIr = 0;
+    private float $valorRps = 0;
 
-    public function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO/*, bool $calledByChild = false*/)
+    private ?DateTime $dataFatoGerador = null;
+    private ?Pessoa $tomador = null;
+
+    public static function getInstance(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO): NFSe
     {
-        parent::__construct($emitente, $ambiente);
+        $className = Parameters::getClasseNFSeFromCidade($emitente->getEnderecoCidadeCodigoIbge());
+        return new $className($emitente, $ambiente);
+    }
 
-        // $this->setAmbiente($ambiente);
+    /**
+     * Get the value of itens
+     */
+    public function getItens(): array
+    {
+        return $this->itens;
+    }
+
+    /**
+     * Set the value of itens
+     */
+    public function setItens(array $itens): self
+    {
         $this->itens = [];
 
-        $this->setDataFatoGerador($this->getEmitente()->getLocalDateTime());
-        $this->setNumeroRps(0);
-        $this->setProtocoloAutorizacao('');
-        $this->setUrlDanfse('');
-        $this->setValorContribuicaoSocial(0);
-        $this->setValorInss(0);
-        $this->setValorIr(0);
-        $this->setValorRps(0);
-
-        $this->setEmitente($emitente);
-
-        // if ($calledByChild) {
-        // } else {
-        //     $this = new ("DFe\\NFSe\\" . $this->getClasseNFSe())($emitente, $ambiente, true);
-        // }
-    }
-
-    private function procreate(): NFSe
-    {
-        $className = Parameters::getClasseNFSeFromCidade($this->getEmitente()->getEnderecoCidadeCodigoIbge());
-
-        $child = new $className($this->getEmitente(), $this->getAmbiente());
-
-        $parentMethods = get_class_methods($this);
-        $parentMethods = array_filter($parentMethods, function ($method) {
-            return strpos($method, 'get') === 0;
-        });
-
-        $childMethods = get_class_methods($child);
-
-        foreach ($parentMethods as $method) {
-            $get = $method;
-            $set = 'set' . substr($method, 3);
-
-            if (in_array($set, $childMethods)) {
-                $reflectionParent = new ReflectionMethod($this, $get);
-                $reflectionParent->setAccessible(true);
-
-                $reflectionChild = new ReflectionMethod($child, $set);
-                $reflectionChild->setAccessible(true);
-
-                if (!$reflectionParent->isPrivate() && !$reflectionChild->isPrivate()) {
-                    $child->{$set}($this->{$get}());
-                }
-            }
+        foreach ($itens as $item) {
+            $this->addItem($item);
         }
 
-        return $child;
+        return $this;
     }
 
-    public function cancelar(string $motivo, int $numero = null, int $serie = null)
+    public function addItem(NFSeItem $item): self
     {
-        $nfse = $this->procreate();
-        return $nfse->cancelar($motivo, $numero, $serie);
-    }
-
-    public function emitir()
-    {
-        $nfse = $this->procreate();
-        return $nfse->emitir();
-    }
-
-    /**
-     * Get the value of dataFatoGerador
-     */
-    public function getDataFatoGerador(): DateTime
-    {
-        return $this->dataFatoGerador;
-    }
-
-    /**
-     * Set the value of dataFatoGerador
-     */
-    public function setDataFatoGerador(DateTime $dataFatoGerador): self
-    {
-        $this->dataFatoGerador = $dataFatoGerador;
+        $this->itens[] = $item;
 
         return $this;
     }
@@ -129,19 +76,19 @@ class NFSe extends DFe
     }
 
     /**
-     * Get the value of tomador
+     * Get the value of urlDanfse
      */
-    public function getTomador(): Pessoa
+    public function getUrlDanfse(): string
     {
-        return $this->tomador;
+        return $this->urlDanfse;
     }
 
     /**
-     * Set the value of tomador
+     * Set the value of urlDanfse
      */
-    public function setTomador(Pessoa $tomador): self
+    public function setUrlDanfse(string $urlDanfse): self
     {
-        $this->tomador = $tomador;
+        $this->urlDanfse = $urlDanfse;
 
         return $this;
     }
@@ -219,46 +166,37 @@ class NFSe extends DFe
     }
 
     /**
-     * Get the value of itens
+     * Get the value of dataFatoGerador
      */
-    public function getItens(): array
+    public function getDataFatoGerador(): ?DateTime
     {
-        return $this->itens;
+        return $this->dataFatoGerador;
     }
 
     /**
-     * Set the value of itens
+     * Set the value of dataFatoGerador
      */
-    public function setItens(array $itens): self
+    public function setDataFatoGerador(?DateTime $dataFatoGerador): self
     {
-        foreach ($itens as $item) {
-            $this->addItem($item);
-        }
-
-        return $this;
-    }
-
-    public function addItem(NFSeItem $item): self
-    {
-        $this->itens[] = $item;
+        $this->dataFatoGerador = $dataFatoGerador;
 
         return $this;
     }
 
     /**
-     * Get the value of urlDanfse
+     * Get the value of tomador
      */
-    public function getUrlDanfse(): string
+    public function getTomador(): ?Pessoa
     {
-        return $this->urlDanfse;
+        return $this->tomador;
     }
 
     /**
-     * Set the value of urlDanfse
+     * Set the value of tomador
      */
-    public function setUrlDanfse(string $urlDanfse): self
+    public function setTomador(?Pessoa $tomador): self
     {
-        $this->urlDanfse = $urlDanfse;
+        $this->tomador = $tomador;
 
         return $this;
     }

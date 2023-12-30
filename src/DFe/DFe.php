@@ -3,55 +3,54 @@
 namespace DFe;
 
 use DateTime;
-use DateTimeImmutable;
-use DateTimeZone;
-use Entities\ConfiguracaoCidade;
 use Entities\Emitente;
-use Entities\Parameters;
-use Entities\Pessoa;
-use Exception;
 use Libraries\Constants;
-use ReflectionClass;
 
 abstract class DFe
 {
     protected $xml;
 
     private int $ambiente;
-    private DateTime $dataEmissao;
-    private DateTime $dataCancelamento;
     private Emitente $emitente;
-    private string $observacao;
-    private string $serie;
-    private int $numero;
-    private string $protocoloAutorizacao;
-    private string $protocoloCancelamento;
-    private int $situacao;
-    private float $valor;
-    private float $valorCofins;
-    private float $valorDesconto;
-    private float $valorPis;
+    private int $numero = 0;
+    private string $observacao = "";
+    private string $protocoloAutorizacao = "";
+    private string $protocoloCancelamento = "";
+    private string $serie = "";
+    private int $situacao = 0;
+    private float $valor = 0;
+    private float $valorCofins = 0;
+    private float $valorDesconto = 0;
+    private float $valorPis = 0;
+
+    private ?DateTime $dataEmissao = null;
+    private ?DateTime $dataCancelamento = null;
 
     abstract public function cancelar(string $motivo, int $numero = null, int $serie = null);
     abstract public function emitir();
 
     function __construct(Emitente $emitente, int $ambiente = Constants::AMBIENTE_HOMOLOGACAO)
     {
-        $this->emitente = $emitente;
-
         $this->setAmbiente($ambiente);
-        $this->setDataEmissao($this->getEmitente()->getLocalDateTime());
-        $this->setDataCancelamento($this->getEmitente()->getLocalDateTime());
-        $this->setNumero(0);
-        $this->setProtocoloAutorizacao('');
-        $this->setProtocoloCancelamento('');
-        $this->setObservacao("");
-        $this->setSerie("");
-        $this->setSituacao(0);
-        $this->setValor(0);
-        $this->setValorCofins(0);
-        $this->setValorDesconto(0);
-        $this->setValorPis(0);
+        $this->setEmitente($emitente);
+    }
+
+    /**
+     * Get the value of xml
+     */
+    public function getXml()
+    {
+        return $this->xml;
+    }
+
+    /**
+     * Set the value of xml
+     */
+    public function setXml($xml): self
+    {
+        $this->xml = $xml;
+
+        return $this;
     }
 
     /**
@@ -73,7 +72,7 @@ abstract class DFe
     }
 
     /**
-     * Get the value of Emitente
+     * Get the value of emitente
      */
     public function getEmitente(): Emitente
     {
@@ -81,7 +80,7 @@ abstract class DFe
     }
 
     /**
-     * Set the value of Emitente
+     * Set the value of emitente
      */
     public function setEmitente(Emitente $emitente): self
     {
@@ -91,19 +90,19 @@ abstract class DFe
     }
 
     /**
-     * Get the value of xml
+     * Get the value of numero
      */
-    public function getXml()
+    public function getNumero(): int
     {
-        return $this->xml;
+        return $this->numero;
     }
 
     /**
-     * Set the value of xml
+     * Set the value of numero
      */
-    public function setXml($xml): self
+    public function setNumero(int $numero): self
     {
-        $this->xml = $xml;
+        $this->numero = $numero;
 
         return $this;
     }
@@ -127,6 +126,42 @@ abstract class DFe
     }
 
     /**
+     * Get the value of protocoloAutorizacao
+     */
+    public function getProtocoloAutorizacao(): string
+    {
+        return $this->protocoloAutorizacao;
+    }
+
+    /**
+     * Set the value of protocoloAutorizacao
+     */
+    public function setProtocoloAutorizacao(string $protocoloAutorizacao): self
+    {
+        $this->protocoloAutorizacao = $protocoloAutorizacao;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of protocoloCancelamento
+     */
+    public function getProtocoloCancelamento(): string
+    {
+        return $this->protocoloCancelamento;
+    }
+
+    /**
+     * Set the value of protocoloCancelamento
+     */
+    public function setProtocoloCancelamento(string $protocoloCancelamento): self
+    {
+        $this->protocoloCancelamento = $protocoloCancelamento;
+
+        return $this;
+    }
+
+    /**
      * Get the value of serie
      */
     public function getSerie(): string
@@ -140,6 +175,24 @@ abstract class DFe
     public function setSerie(string $serie): self
     {
         $this->serie = $serie;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of situacao
+     */
+    public function getSituacao(): int
+    {
+        return $this->situacao;
+    }
+
+    /**
+     * Set the value of situacao
+     */
+    public function setSituacao(int $situacao): self
+    {
+        $this->situacao = $situacao;
 
         return $this;
     }
@@ -217,27 +270,9 @@ abstract class DFe
     }
 
     /**
-     * Get the value of numero
-     */
-    public function getNumero(): int
-    {
-        return $this->numero;
-    }
-
-    /**
-     * Set the value of numero
-     */
-    public function setNumero(int $numero): self
-    {
-        $this->numero = $numero;
-
-        return $this;
-    }
-
-    /**
      * Get the value of dataEmissao
      */
-    public function getDataEmissao(): DateTime
+    public function getDataEmissao(): ?DateTime
     {
         return $this->dataEmissao;
     }
@@ -245,7 +280,7 @@ abstract class DFe
     /**
      * Set the value of dataEmissao
      */
-    public function setDataEmissao(DateTime $dataEmissao): self
+    public function setDataEmissao(?DateTime $dataEmissao): self
     {
         $this->dataEmissao = $dataEmissao;
 
@@ -253,45 +288,9 @@ abstract class DFe
     }
 
     /**
-     * Get the value of protocoloAutorizacao
-     */
-    public function getProtocoloAutorizacao(): string
-    {
-        return $this->protocoloAutorizacao;
-    }
-
-    /**
-     * Set the value of protocoloAutorizacao
-     */
-    public function setProtocoloAutorizacao(string $protocoloAutorizacao): self
-    {
-        $this->protocoloAutorizacao = $protocoloAutorizacao;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of situacao
-     */
-    public function getSituacao(): int
-    {
-        return $this->situacao;
-    }
-
-    /**
-     * Set the value of situacao
-     */
-    public function setSituacao(int $situacao): self
-    {
-        $this->situacao = $situacao;
-
-        return $this;
-    }
-
-    /**
      * Get the value of dataCancelamento
      */
-    public function getDataCancelamento(): DateTime
+    public function getDataCancelamento(): ?DateTime
     {
         return $this->dataCancelamento;
     }
@@ -299,27 +298,9 @@ abstract class DFe
     /**
      * Set the value of dataCancelamento
      */
-    public function setDataCancelamento(DateTime $dataCancelamento): self
+    public function setDataCancelamento(?DateTime $dataCancelamento): self
     {
         $this->dataCancelamento = $dataCancelamento;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of protocoloCancelamento
-     */
-    public function getProtocoloCancelamento(): string
-    {
-        return $this->protocoloCancelamento;
-    }
-
-    /**
-     * Set the value of protocoloCancelamento
-     */
-    public function setProtocoloCancelamento(string $protocoloCancelamento): self
-    {
-        $this->protocoloCancelamento = $protocoloCancelamento;
 
         return $this;
     }

@@ -4,64 +4,36 @@ namespace Entities;
 
 class NFSeItem
 {
-    private int $tributacaoMunicipioTomador;
-    private float $valor;
-    private string $codigo;
-    private string $codigoAtividade;
-    private string $descricao;
-    private float $aliquota;
-    private int $situacaoTributaria;
-    private float $valorTributavel;
-    private float $valorDeducao;
-    private float $valorIssrf;
+    private float $aliquota = 0;
+    private string $codigo = "";
+    private string $codigoAtividade = "";
+    private string $descricao = "";
+    private int $situacaoTributaria = 0;
+    private int $tributacaoMunicipioTomador = 0;
+    private float $valor = 0;
+    private float $valorTributavel = 0;
+    private float $valorDeducao = 0;
+    private float $valorIssrf = 0;
 
     public function __construct(string $descricao)
     {
         $this->setDescricao($descricao);
-
-        $this->setTributacaoMunicipioTomador(0);
-        $this->setValor(0);
-        $this->setCodigo('');
-        $this->setCodigoAtividade('');
-        $this->setAliquota(0);
-        $this->setSituacaoTributaria(0);
-        $this->setValorTributavel(0);
-        $this->setValorDeducao(0);
-        $this->setValorIssrf(0);
     }
 
     /**
-     * Get the value of tributacaoMunicipioTomador
+     * Get the value of aliquota
      */
-    public function getTributacaoMunicipioTomador(): int
+    public function getAliquota(): float
     {
-        return $this->tributacaoMunicipioTomador;
+        return $this->aliquota;
     }
 
     /**
-     * Set the value of tributacaoMunicipioTomador
+     * Set the value of aliquota
      */
-    public function setTributacaoMunicipioTomador(int $tributacaoMunicipioTomador): self
+    public function setAliquota(float $aliquota): self
     {
-        $this->tributacaoMunicipioTomador = $tributacaoMunicipioTomador;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of valor
-     */
-    public function getValor(): float
-    {
-        return $this->valor;
-    }
-
-    /**
-     * Set the value of valor
-     */
-    public function setValor(float $valor): self
-    {
-        $this->valor = $valor;
+        $this->aliquota = $aliquota;
 
         return $this;
     }
@@ -121,24 +93,6 @@ class NFSeItem
     }
 
     /**
-     * Get the value of aliquota
-     */
-    public function getAliquota(): float
-    {
-        return $this->aliquota;
-    }
-
-    /**
-     * Set the value of aliquota
-     */
-    public function setAliquota(float $aliquota): self
-    {
-        $this->aliquota = $aliquota;
-
-        return $this;
-    }
-
-    /**
      * Get the value of situacaoTributaria
      */
     public function getSituacaoTributaria(): int
@@ -152,6 +106,42 @@ class NFSeItem
     public function setSituacaoTributaria(int $situacaoTributaria): self
     {
         $this->situacaoTributaria = $situacaoTributaria;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of tributacaoMunicipioTomador
+     */
+    public function getTributacaoMunicipioTomador(): int
+    {
+        return $this->tributacaoMunicipioTomador;
+    }
+
+    /**
+     * Set the value of tributacaoMunicipioTomador
+     */
+    public function setTributacaoMunicipioTomador(int $tributacaoMunicipioTomador): self
+    {
+        $this->tributacaoMunicipioTomador = $tributacaoMunicipioTomador;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of valor
+     */
+    public function getValor(): float
+    {
+        return $this->valor;
+    }
+
+    /**
+     * Set the value of valor
+     */
+    public function setValor(float $valor): self
+    {
+        $this->valor = $valor;
 
         return $this;
     }

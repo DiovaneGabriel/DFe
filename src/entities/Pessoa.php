@@ -8,24 +8,24 @@ use DateTimeZone;
 
 class Pessoa
 {
-    private string $cnpj;
-    private string $cpf;
-    private string $documentoEstrangeiro;
-    private string $email;
-    private string $enderecoBairro;
-    private string $enderecoCep;
-    private string $enderecoCidade;
-    private string $enderecoCidadeCodigoIbge;
-    private string $enderecoCidadeCodigoTom;
-    private string $enderecoComplemento;
-    private string $enderecoEstado;
-    private string $enderecoLogradouro;
-    private string $enderecoNumero;
-    private string $enderecoPais;
-    private string $inscricaoEstadual;
-    private string $nome;
-    private string $razaoSocial;
-    private string $tipo;
+    private string $cnpj = "";
+    private string $cpf = "";
+    private string $documentoEstrangeiro = "";
+    private string $email = "";
+    private string $enderecoBairro = "";
+    private string $enderecoCep = "";
+    private string $enderecoCidade = "";
+    private string $enderecoCidadeCodigoIbge = "";
+    private string $enderecoCidadeCodigoTom = "";
+    private string $enderecoComplemento = "";
+    private string $enderecoEstado = "";
+    private string $enderecoLogradouro = "";
+    private string $enderecoNumero = "";
+    private string $enderecoPais = "";
+    private string $inscricaoEstadual = "";
+    private string $nome = "";
+    private string $razaoSocial = "";
+    private string $tipo = "";
 
     function __construct($nome)
     {

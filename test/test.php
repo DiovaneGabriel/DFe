@@ -23,7 +23,7 @@ $tomador
     ->setEnderecoCidadeCodigoTom("8899")
     ->setEnderecoCep("93800126");
 
-$nfse = new NFSe($emitente, Constants::AMBIENTE_PRODUCAO);
+$nfse = NFSe::getInstance($emitente, Constants::AMBIENTE_PRODUCAO);
 $nfse
     ->setTomador($tomador)
     ->setSerie(1);
@@ -37,12 +37,12 @@ $nfseItem
     ->setValorTributavel(1)
     ->setValor(1);
 
-// $nfse = $nfse->setNumeroRps(17)
-//     ->setValor(1)
-//     ->addItem($nfseItem)
-//     ->emitir();
+$nfse->setNumeroRps(18)
+    ->setValor(1)
+    ->addItem($nfseItem)
+    ->emitir();
 
-// $nfse = $nfse->cancelar("NFS-e emitida para teste", 20);
+$nfse->cancelar("NFS-e emitida para teste");
 
 echo '<pre>';
 var_dump($nfse);
