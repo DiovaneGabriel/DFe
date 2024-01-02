@@ -6,7 +6,10 @@ use DFe\NFSe;
 use Entities\Emitente;
 use Entities\NFSeItem;
 use Entities\Pessoa;
+use Graylog\Graylog;
 use Libraries\Constants;
+
+$graylog = new Graylog('http://graylog', 12201);
 
 $emitente = new Emitente("DB Serviços de Informações Ltda", 4319901, "51941986000135", "Db51941!");
 $emitente->setEnderecoCidadeCodigoTom("8899");
@@ -38,6 +41,9 @@ $tomador
     ->setEnderecoCep("93800126");
 
 $nfse = NFSe::getInstance($emitente, Constants::AMBIENTE_HOMOLOGACAO);
+
+$nfse->setGraylog($graylog);
+
 $nfse
     ->setTomador($tomador)
     ->setSerie(1);
@@ -51,7 +57,7 @@ $nfseItem
     ->setValorTributavel(1.2)
     ->setValor(1.2);
 
-// $nfse->setNumeroRps(21)
+// $nfse->setNumeroRps(23)
 //     ->setValor(1.2)
 //     ->addItem($nfseItem)
 //     ->emitir();

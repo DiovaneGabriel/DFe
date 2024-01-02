@@ -20,5 +20,8 @@
             "Entities\\": "src/entities/",
             "Libraries\\": "src/libraries/"
         }
+    },
+    "require": {
+        "diovanegabriel/graylog": "^1.0"
     }
 }

@@ -36,4 +36,11 @@ class XML
 
         return $xml;
     }
+
+    public static function minify(string $xml): string
+    {
+        $xml = preg_replace('/>\s+</', '><', $xml);
+        $xml = mb_convert_encoding($xml, 'UTF-8', mb_detect_encoding($xml, 'UTF-8, ISO-8859-1', true));
+        return $xml;
+    }
 }

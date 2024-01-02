@@ -4,10 +4,13 @@ namespace DFe;
 
 use DateTime;
 use Entities\Emitente;
+use Graylog\Graylog;
 use Libraries\Constants;
 
 abstract class DFe
 {
+
+    private ?Graylog $graylog = null;
 
     private int $ambiente;
     private Emitente $emitente;
@@ -33,6 +36,38 @@ abstract class DFe
     {
         $this->setAmbiente($ambiente);
         $this->setEmitente($emitente);
+    }
+
+    protected function createLog(?string $request, ?string $response, string $level = Graylog::LEVEL_INFO)
+    {
+        if ($this->getGraylog()) {
+
+            $trace = debug_backtrace();
+
+            $method = "";
+            for ($i = 3; $i <= count($trace); $i++) {
+                !$method ? $method = $trace[$i]['function'] : null;
+            }
+
+            $class = get_class($this);
+            $class = explode('\\', $class);
+            $class = end($class);
+
+            $message = $level . " " . $class . " " . $method;
+
+            $logContent = [
+                "client" => $this->getEmitente()->getCnpj(),
+                "class" => $class,
+                "message" => $message,
+                "method" => $method,
+                "level" => $level,
+                "request" => $request,
+                "response" => $response
+            ];
+
+            return $this->getGraylog()->send($logContent);
+        }
+        return true;
     }
 
     /**
@@ -301,6 +336,24 @@ abstract class DFe
     public function setDataCancelamento(?DateTime $dataCancelamento): self
     {
         $this->dataCancelamento = $dataCancelamento;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of graylog
+     */
+    public function getGraylog(): ?Graylog
+    {
+        return $this->graylog;
+    }
+
+    /**
+     * Set the value of graylog
+     */
+    public function setGraylog(?Graylog $graylog): self
+    {
+        $this->graylog = $graylog;
 
         return $this;
     }

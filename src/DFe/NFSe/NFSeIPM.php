@@ -7,6 +7,7 @@ use DFe\DFeException\NFSeIPMException;
 use DFe\NFSe;
 use Entities\Parameters;
 use Exception;
+use Graylog\Graylog;
 use Libraries\Cache;
 use Libraries\Constants;
 use Libraries\Format;
@@ -31,10 +32,7 @@ class NFSeIPM extends NFSe
         $this->setXml(XML::createFromArray($xml));
 
         if ($response = $this->sendRequest()) {
-            $response = preg_replace('/>\s+</', '><', $response);
-            $response = mb_convert_encoding($response, 'UTF-8', mb_detect_encoding($response, 'UTF-8, ISO-8859-1', true));
-
-            $this->setXml($response);
+            $this->setXml(XML::minify($response));
         }
 
         return $this;
@@ -114,7 +112,9 @@ class NFSeIPM extends NFSe
             $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
             $this->setSituacao(Constants::SITUACAO_EMITIDO);
 
-            $this->consultar();
+            if ($this->getAmbiente() == Constants::AMBIENTE_PRODUCAO) {
+                $this->consultar();
+            }
         }
 
         return $this;
@@ -245,6 +245,7 @@ class NFSeIPM extends NFSe
         if ($this->decodeResponse($response)) {
             return $response->return;
         }
+
         return false;
     }
 
@@ -259,19 +260,20 @@ class NFSeIPM extends NFSe
                     $codigo = substr(((array)$obj->mensagem->codigo)[0], 0, 5);
 
                     if ($codigo != '00001') {
+                        $this->createLog($this->getXml(), XML::minify($response), Graylog::LEVEL_ERROR);
                         throw new NFSeIPMException((array)$obj->mensagem->codigo);
                     }
                 }
-            } else {
-                if (!empty($obj->situacao_descricao_nfse)) {
-                    return true;
-                } else {
-                    throw new NFSeIPMException((array)$obj->mensagem->codigo);
-                }
+            } elseif (empty($obj->situacao_descricao_nfse) && empty($obj->nf->situacao_descricao_nfse)) {
+                $this->createLog($this->getXml(), XML::minify($response), Graylog::LEVEL_ERROR);
+                throw new NFSeIPMException((array)$obj->mensagem->codigo);
             }
         } else {
+            $this->createLog($this->getXml(), $response->return ? $response->return : $response->code, Graylog::LEVEL_FATAL);
             throw new Exception($response->return);
         }
+
+        $this->createLog($this->getXml(), XML::minify($response));
 
         return true;
     }
