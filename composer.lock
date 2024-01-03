@@ -157,16 +157,16 @@
         },
         {
             "name": "diovanegabriel/awss3",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DiovaneGabriel/AWSS3.git",
-                "reference": "f028d802b4d6710e9a14b636e3783f3da8dbd602"
+                "reference": "1a4a1348f8c0bcb88f0c5eeb32a01e3754ae356c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DiovaneGabriel/AWSS3/zipball/f028d802b4d6710e9a14b636e3783f3da8dbd602",
-                "reference": "f028d802b4d6710e9a14b636e3783f3da8dbd602",
+                "url": "https://api.github.com/repos/DiovaneGabriel/AWSS3/zipball/1a4a1348f8c0bcb88f0c5eeb32a01e3754ae356c",
+                "reference": "1a4a1348f8c0bcb88f0c5eeb32a01e3754ae356c",
                 "shasum": ""
             },
             "require": {
@@ -199,9 +199,9 @@
             ],
             "support": {
                 "issues": "https://github.com/DiovaneGabriel/AWSS3/issues",
-                "source": "https://github.com/DiovaneGabriel/AWSS3/tree/v1.0.1"
+                "source": "https://github.com/DiovaneGabriel/AWSS3/tree/v1.0.2"
             },
-            "time": "2024-01-03T03:43:22+00:00"
+            "time": "2024-01-03T14:55:46+00:00"
         },
         {
             "name": "diovanegabriel/graylog",
