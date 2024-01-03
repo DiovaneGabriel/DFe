@@ -7,15 +7,10 @@ test:
 install:
 	clear && \
 	docker compose up -d && \
-	docker exec -it php-test sh -c "cd /var/www/html && composer update"
+	docker exec -it php-test sh -c "cd /var/www/html && composer update --dev"
 
 up:
 	docker compose up -d
 
 down:
 	docker compose down
-
-autoload:
-	clear && \
-	sudo rm -rf vendor/ && \
-	docker exec -it php-test sh -c "cd /var/www/html && composer dump-autoload"

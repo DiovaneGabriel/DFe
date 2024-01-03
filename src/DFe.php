@@ -2,6 +2,7 @@
 
 namespace DFe;
 
+use AwsS3\AwsS3;
 use DateTime;
 use Entities\Emitente;
 use Graylog\Graylog;
@@ -10,6 +11,7 @@ use Libraries\Constants;
 abstract class DFe
 {
 
+    private ?AwsS3 $awsS3 = null;
     private ?Graylog $graylog = null;
 
     private int $ambiente;
@@ -20,6 +22,7 @@ abstract class DFe
     private string $protocoloCancelamento = "";
     private string $serie = "";
     private int $situacao = 0;
+    private string $urlXml = "";
     private float $valor = 0;
     private float $valorCofins = 0;
     private float $valorDesconto = 0;
@@ -354,6 +357,42 @@ abstract class DFe
     public function setGraylog(?Graylog $graylog): self
     {
         $this->graylog = $graylog;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of awsS3
+     */
+    public function getAwsS3(): ?AWSS3
+    {
+        return $this->awsS3;
+    }
+
+    /**
+     * Set the value of awsS3
+     */
+    public function setAwsS3(?AWSS3 $awsS3): self
+    {
+        $this->awsS3 = $awsS3;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of urlXml
+     */
+    public function getUrlXml(): string
+    {
+        return $this->urlXml;
+    }
+
+    /**
+     * Set the value of urlXml
+     */
+    public function setUrlXml(string $urlXml): self
+    {
+        $this->urlXml = $urlXml;
 
         return $this;
     }

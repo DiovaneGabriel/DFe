@@ -1,8 +1,8 @@
 <?php
 
-namespace DFe\DFeException;
+namespace DFe\Exception;
 
-use DFe\DFeException\NFSeException;
+use DFe\Exception\NFSeException;
 
 class NFSeIPMException extends NFSeException
 {

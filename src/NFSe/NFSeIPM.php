@@ -3,7 +3,7 @@
 namespace DFe\NFSe;
 
 use DateTime;
-use DFe\DFeException\NFSeIPMException;
+use DFe\Exception\NFSeIPMException;
 use DFe\NFSe;
 use Entities\Parameters;
 use Exception;
@@ -33,6 +33,14 @@ class NFSeIPM extends NFSe
 
         if ($response = $this->sendRequest()) {
             $this->setXml(XML::minify($response));
+
+            if ($this->getAwsS3()) {
+                $target = $this->getEmitente()->getCnpj() . '/NFSe/' . $this->getProtocoloAutorizacao() . ".xml";
+
+                if ($urlXml = $this->getAwsS3()->send($this->getXml(), $target, true)) {
+                    $this->setUrlXml($urlXml);
+                }
+            }
         }
 
         return $this;

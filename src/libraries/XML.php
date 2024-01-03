@@ -37,10 +37,15 @@ class XML
         return $xml;
     }
 
-    public static function minify(string $xml): string
+    public static function minify(string $xml, bool $toUtf8 = true): string
     {
         $xml = preg_replace('/>\s+</', '><', $xml);
-        $xml = mb_convert_encoding($xml, 'UTF-8', mb_detect_encoding($xml, 'UTF-8, ISO-8859-1', true));
+
+        if ($toUtf8) {
+            $xml = mb_convert_encoding($xml, 'UTF-8', mb_detect_encoding($xml, 'UTF-8, ISO-8859-1', true));
+            $xml = str_replace('<?xml version="1.0" encoding="ISO-8859-1"?>', '<?xml version="1.0" encoding="UTF-8"?>', $xml);
+        }
+
         return $xml;
     }
 }

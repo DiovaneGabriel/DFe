@@ -1,6 +1,6 @@
 <?php
 
-namespace DFe\DFeException;
+namespace DFe\Exception;
 
 use Exception;
 
