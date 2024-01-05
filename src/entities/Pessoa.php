@@ -1,10 +1,11 @@
 <?php
 
-namespace Entities;
+namespace DBarbieri\DFe\Entities;
 
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use DBarbieri\DFe\Config\Parameters;
 
 class Pessoa
 {

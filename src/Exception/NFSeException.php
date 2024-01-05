@@ -1,8 +1,6 @@
 <?php
 
-namespace DFe\Exception;
-
-use DFe\Exception\DFeException;
+namespace DBarbieri\DFe\Exception;
 
 class NFSeException extends DFeException
 {

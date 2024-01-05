@@ -1,6 +1,6 @@
 <?php
 
-namespace DFe\Exception;
+namespace DBarbieri\DFe\Exception;
 
 use Exception;
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace DFe;
+namespace DBarbieri\DFe;
 
 use DateTime;
-use Entities\Emitente;
-use Entities\NFSeItem;
-use Entities\Parameters;
-use Entities\Pessoa;
-use Libraries\Constants;
+use DBarbieri\DFe\Config\Constants;
+use DBarbieri\DFe\Config\Parameters;
+use DBarbieri\DFe\Entities\Emitente;
+use DBarbieri\DFe\Entities\NFSeItem;
+use DBarbieri\DFe\Entities\Pessoa;
 
 abstract class NFSe extends DFe
 {

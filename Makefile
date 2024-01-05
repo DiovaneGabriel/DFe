@@ -1,13 +1,18 @@
 .PHONY: test
 
+CONTAINER_PHP = dfe-php-test
+
 test:
 	clear && \
-	docker exec php-test php ./test/test.php
+	docker exec ${CONTAINER_PHP} php ./test/test.php
 
 install:
 	clear && \
-	docker compose up -d && \
-	docker exec -it php-test sh -c "cd /var/www/html && composer update --dev"
+	docker exec -it ${CONTAINER_PHP} sh -c "cd /var/www/html && composer update --dev"
+
+bash:
+	clear && \
+	docker exec -it ${CONTAINER_PHP} /bin/bash
 
 up:
 	docker compose up -d

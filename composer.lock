@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "377e6d9295c191f3d6a0f8694e35f063",
+    "content-hash": "ca48e8b1d451910eb4b63ffd2df7e125",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -62,16 +62,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.295.4",
+            "version": "3.295.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "2372661db989fe4229abd95f4434b37252076d58"
+                "reference": "9b0b2daf46d5e6a4600575917cea0764e4dbb6b5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/2372661db989fe4229abd95f4434b37252076d58",
-                "reference": "2372661db989fe4229abd95f4434b37252076d58",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9b0b2daf46d5e6a4600575917cea0764e4dbb6b5",
+                "reference": "9b0b2daf46d5e6a4600575917cea0764e4dbb6b5",
                 "shasum": ""
             },
             "require": {
@@ -151,22 +151,22 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.295.4"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.295.6"
             },
-            "time": "2023-12-29T19:07:49+00:00"
+            "time": "2024-01-04T19:43:02+00:00"
         },
         {
             "name": "diovanegabriel/awss3",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DiovaneGabriel/AWSS3.git",
-                "reference": "1a4a1348f8c0bcb88f0c5eeb32a01e3754ae356c"
+                "reference": "8e2353f3d9b689d5fb680bf465927f595cbd77e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DiovaneGabriel/AWSS3/zipball/1a4a1348f8c0bcb88f0c5eeb32a01e3754ae356c",
-                "reference": "1a4a1348f8c0bcb88f0c5eeb32a01e3754ae356c",
+                "url": "https://api.github.com/repos/DiovaneGabriel/AWSS3/zipball/8e2353f3d9b689d5fb680bf465927f595cbd77e7",
+                "reference": "8e2353f3d9b689d5fb680bf465927f595cbd77e7",
                 "shasum": ""
             },
             "require": {
@@ -179,8 +179,8 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "AwsS3\\": "src/",
-                    "Libraries\\": "src/libraries/"
+                    "DBarbieri\\AwsS3\\": "src/",
+                    "DBarbieri\\AwsS3\\Libraries\\": "src/libraries/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -199,28 +199,28 @@
             ],
             "support": {
                 "issues": "https://github.com/DiovaneGabriel/AWSS3/issues",
-                "source": "https://github.com/DiovaneGabriel/AWSS3/tree/v1.0.2"
+                "source": "https://github.com/DiovaneGabriel/AWSS3/tree/v1.0.3"
             },
-            "time": "2024-01-03T14:55:46+00:00"
+            "time": "2024-01-05T00:52:27+00:00"
         },
         {
             "name": "diovanegabriel/graylog",
-            "version": "v1.1.1",
+            "version": "v1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DiovaneGabriel/Graylog.git",
-                "reference": "1f743fcc9b59fae3d9c2c0e4cb7e11285421da13"
+                "reference": "4319b7afa59de1dde91b9287ec638dbe752e63b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DiovaneGabriel/Graylog/zipball/1f743fcc9b59fae3d9c2c0e4cb7e11285421da13",
-                "reference": "1f743fcc9b59fae3d9c2c0e4cb7e11285421da13",
+                "url": "https://api.github.com/repos/DiovaneGabriel/Graylog/zipball/4319b7afa59de1dde91b9287ec638dbe752e63b1",
+                "reference": "4319b7afa59de1dde91b9287ec638dbe752e63b1",
                 "shasum": ""
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Graylog\\": "src/"
+                    "DBarbieri\\Graylog\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -239,9 +239,49 @@
             ],
             "support": {
                 "issues": "https://github.com/DiovaneGabriel/Graylog/issues",
-                "source": "https://github.com/DiovaneGabriel/Graylog/tree/v1.1.1"
+                "source": "https://github.com/DiovaneGabriel/Graylog/tree/v1.1.2"
             },
-            "time": "2024-01-02T19:59:27+00:00"
+            "time": "2024-01-05T00:39:45+00:00"
+        },
+        {
+            "name": "diovanegabriel/php-utils",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DiovaneGabriel/php-utils.git",
+                "reference": "8422dd8188ae8fcc4b7e1a78aed318d5890bec6b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DiovaneGabriel/php-utils/zipball/8422dd8188ae8fcc4b7e1a78aed318d5890bec6b",
+                "reference": "8422dd8188ae8fcc4b7e1a78aed318d5890bec6b",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DBarbieri\\Utils\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Diovane Barbieri Gabriel"
+                }
+            ],
+            "description": "Useful functions for PHP",
+            "keywords": [
+                "functions",
+                "utils"
+            ],
+            "support": {
+                "issues": "https://github.com/DiovaneGabriel/php-utils/issues",
+                "source": "https://github.com/DiovaneGabriel/php-utils/tree/v1.0.2"
+            },
+            "time": "2024-01-05T00:53:51+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

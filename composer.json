@@ -15,15 +15,16 @@
     ],
     "autoload": {
         "psr-4": {
-            "DFe\\": "src/",
-            "DFeException\\": "src/Exception",
-            "Entities\\": "src/entities/",
-            "Libraries\\": "src/libraries/"
+            "DBarbieri\\DFe\\": "src/",
+            "DBarbieri\\DFe\\Config\\": "src/config/",
+            "DBarbieri\\DFe\\Entities\\": "src/entities/",
+            "DBarbieri\\DFe\\Exception\\": "src/Exception/"
         }
     },
     "require": {
         "diovanegabriel/graylog": "^1.0",
-        "diovanegabriel/awss3": "^1.0"
+        "diovanegabriel/awss3": "^1.0",
+        "diovanegabriel/php-utils": "^1.0"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^5.6"

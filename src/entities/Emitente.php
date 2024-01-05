@@ -1,6 +1,6 @@
 <?php
 
-namespace Entities;
+namespace DBarbieri\DFe\Entities;
 
 class Emitente extends Pessoa
 {

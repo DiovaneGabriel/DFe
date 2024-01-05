@@ -1,18 +1,18 @@
 <?php
 
-namespace DFe\NFSe;
+namespace DBarbieri\DFe\NFSe;
 
 use DateTime;
-use DFe\Exception\NFSeIPMException;
-use DFe\NFSe;
-use Entities\Parameters;
+use DBarbieri\Utils\Cache;
+use DBarbieri\Utils\Format;
+use DBarbieri\Utils\Request;
+use DBarbieri\Utils\Xml;
+use DBarbieri\DFe\Config\Constants;
+use DBarbieri\DFe\Config\Parameters;
+use DBarbieri\DFe\Exception\NFSeIPMException;
+use DBarbieri\DFe\NFSe;
 use Exception;
 use Graylog\Graylog;
-use Libraries\Cache;
-use Libraries\Constants;
-use Libraries\Format;
-use Libraries\Request;
-use Libraries\XML;
 
 class NFSeIPM extends NFSe
 {
@@ -29,10 +29,10 @@ class NFSeIPM extends NFSe
             ]
         ];
 
-        $this->setXml(XML::createFromArray($xml));
+        $this->setXml(Xml::createFromArray($xml));
 
         if ($response = $this->sendRequest()) {
-            $this->setXml(XML::minify($response));
+            $this->setXml(Xml::minify($response));
 
             if ($this->getAwsS3()) {
                 $target = $this->getEmitente()->getCnpj() . '/NFSe/' . $this->getProtocoloAutorizacao() . ".xml";

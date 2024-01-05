@@ -1,9 +1,8 @@
 <?php
 
-namespace Entities;
+namespace DBarbieri\DFe\Config;
 
 use Exception;
-use Libraries\Constants;
 
 class Parameters
 {
@@ -26,7 +25,7 @@ class Parameters
     {
         foreach (self::NFSE_CLASSE_CIDADE as $classe => $cidades) {
             if (in_array($cidadeCodigoIbge, $cidades)) {
-                return "DFe\\NFSe\\" . $classe;
+                return "DBarbieri\\DFe\\NFSe\\" . $classe;
             }
         }
 

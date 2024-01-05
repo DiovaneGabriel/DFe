@@ -1,12 +1,12 @@
 <?php
 
-namespace DFe;
+namespace DBarbieri\DFe;
 
-use AwsS3\AwsS3;
 use DateTime;
-use Entities\Emitente;
-use Graylog\Graylog;
-use Libraries\Constants;
+use DBarbieri\AwsS3\AwsS3;
+use DBarbieri\DFe\Config\Constants;
+use DBarbieri\DFe\Entities\Emitente;
+use DBarbieri\Graylog\Graylog;
 
 abstract class DFe
 {

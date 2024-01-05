@@ -1,16 +1,17 @@
 <?php
 
+use DBarbieri\AwsS3\AwsS3;
+use DBarbieri\DFe\Config\Constants;
+use DBarbieri\DFe\Entities\Emitente;
+use DBarbieri\DFe\Entities\NFSeItem;
+use DBarbieri\DFe\Entities\Pessoa;
+use DBarbieri\DFe\NFSe;
+use DBarbieri\Graylog\Graylog;
+use Dotenv\Dotenv;
+
 require __DIR__ . '/../vendor/autoload.php';
 
-use AwsS3\AwsS3;
-use DFe\NFSe;
-use Entities\Emitente;
-use Entities\NFSeItem;
-use Entities\Pessoa;
-use Graylog\Graylog;
-use Libraries\Constants;
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '../.env');
+$dotenv = Dotenv::createImmutable(__DIR__, '../.env');
 $dotenv->load();
 
 $graylog = new Graylog('http://graylog', 12201);
