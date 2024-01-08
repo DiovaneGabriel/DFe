@@ -5,32 +5,34 @@ namespace DBarbieri\DFe\Entities;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
+use DBarbieri\DFe\Config\Constants;
 use DBarbieri\DFe\Config\Parameters;
 
 class Pessoa
 {
-    private string $nome = "";
-    private string $tipo = "";
-    private ?string $cnpj = "";
-    private ?string $cpf = "";
-    private ?string $documentoEstrangeiro = "";
-    private ?string $email = "";
-    private ?string $enderecoBairro = "";
-    private ?string $enderecoCep = "";
-    private ?string $enderecoCidade = "";
-    private ?string $enderecoCidadeCodigoIbge = "";
-    private ?string $enderecoCidadeCodigoTom = "";
-    private ?string $enderecoComplemento = "";
-    private ?string $enderecoEstado = "";
-    private ?string $enderecoLogradouro = "";
-    private ?string $enderecoNumero = "";
-    private ?string $enderecoPais = "";
-    private ?string $inscricaoEstadual = "";
-    private ?string $razaoSocial = "";
+    private string $nome;
+    private string $tipo;
+    private ?string $cnpj;
+    private ?string $cpf;
+    private ?string $documentoEstrangeiro;
+    private ?string $email;
+    private ?string $enderecoBairro;
+    private ?string $enderecoCep;
+    private ?string $enderecoCidade;
+    private ?string $enderecoCidadeCodigoIbge;
+    private ?string $enderecoCidadeCodigoTom;
+    private ?string $enderecoComplemento;
+    private ?string $enderecoEstado;
+    private ?string $enderecoLogradouro;
+    private ?string $enderecoNumero;
+    private ?string $enderecoPais;
+    private ?string $inscricaoEstadual;
+    private ?string $razaoSocial;
 
     function __construct($nome)
     {
         $this->nome = $nome;
+        $this->tipo = Constants::PESSOA_TIPO_FISICA;
     }
 
     public function getLocalDateTime(): DateTime
@@ -45,7 +47,7 @@ class Pessoa
         return new DateTime($currentDateTime->format('Y-m-d H:i:s'));
     }
 
-    
+
 
     /**
      * Get the value of nome

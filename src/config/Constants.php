@@ -13,4 +13,8 @@ class Constants
 
     const DOCUMENTO_RPS = 'rps';
     const DOCUMENTO_NFSE = 'nfse';
+
+    const PESSOA_TIPO_FISICA = 'f';
+    const PESSOA_TIPO_JURIDICA = 'j';
+    const PESSOA_TIPO_ESTRANGEIRA = 'e';
 }
