@@ -10,4 +10,7 @@ class Constants
     const SITUACAO_AGUARDANDO = 0;
     const SITUACAO_EMITIDO = 1;
     const SITUACAO_CANCELADO = 2;
+
+    const DOCUMENTO_RPS = 'rps';
+    const DOCUMENTO_NFSE = 'nfse';
 }
