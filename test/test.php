@@ -18,7 +18,7 @@ $graylog = new Graylog('http://graylog', 12201);
 $s3 = new AwsS3($_ENV['AWSS3_KEY'], $_ENV['AWSS3_SECRET'], $_ENV['AWSS3_REGION'], $_ENV['AWSS3_BUCKET']);
 $s3->setGraylog($graylog);
 
-$emitente = new Emitente("DB Serviços de Informações Ltda", 4319901, "51941986000135", "Db51941!");
+$emitente = new Emitente("DB Serviços de Informações Ltda", 4319901, "51941986000135", $_ENV['NFSE_PASSWORD']);
 $emitente->setEnderecoCidadeCodigoTom("8899");
 
 $tomador = new Pessoa("Diovane Barbieri Gabriel");
