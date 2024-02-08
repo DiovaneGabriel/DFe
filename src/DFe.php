@@ -3,7 +3,7 @@
 namespace DBarbieri\DFe;
 
 use DateTime;
-use DBarbieri\AwsS3\AwsS3;
+use DBarbieri\Aws\S3;
 use DBarbieri\DFe\Config\Constants;
 use DBarbieri\DFe\Entities\Emitente;
 use DBarbieri\Graylog\Graylog;
@@ -11,7 +11,7 @@ use DBarbieri\Graylog\Graylog;
 abstract class DFe
 {
 
-    private ?AwsS3 $awsS3 = null;
+    private ?S3 $awsS3 = null;
     private ?Graylog $graylog = null;
 
     private int $ambiente;
@@ -364,7 +364,7 @@ abstract class DFe
     /**
      * Get the value of awsS3
      */
-    public function getAwsS3(): ?AWSS3
+    public function getAwsS3(): ?S3
     {
         return $this->awsS3;
     }
@@ -372,7 +372,7 @@ abstract class DFe
     /**
      * Set the value of awsS3
      */
-    public function setAwsS3(?AWSS3 $awsS3): self
+    public function setAwsS3(?S3 $awsS3): self
     {
         $this->awsS3 = $awsS3;
 

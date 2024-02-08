@@ -1,6 +1,6 @@
 <?php
 
-use DBarbieri\AwsS3\AwsS3;
+use DBarbieri\Aws\S3;
 use DBarbieri\DFe\Config\Constants;
 use DBarbieri\DFe\Entities\Emitente;
 use DBarbieri\DFe\Entities\NFSeItem;
@@ -15,7 +15,7 @@ $dotenv = Dotenv::createImmutable(__DIR__, '../.env');
 $dotenv->load();
 
 $graylog = new Graylog('http://graylog', 12201);
-$s3 = new AwsS3($_ENV['AWSS3_KEY'], $_ENV['AWSS3_SECRET'], $_ENV['AWSS3_REGION'], $_ENV['AWSS3_BUCKET']);
+$s3 = new S3($_ENV['AWSS3_KEY'], $_ENV['AWSS3_SECRET'], $_ENV['AWSS3_REGION'], $_ENV['AWSS3_BUCKET']);
 $s3->setGraylog($graylog);
 
 $emitente = new Emitente("DB Serviços de Informações Ltda", 4319901, "51941986000135", $_ENV['NFSE_PASSWORD']);
@@ -47,7 +47,7 @@ $tomador
     ->setEnderecoCidadeCodigoTom("8899")
     ->setEnderecoCep("93800126");
 
-$nfse = NFSe::getInstance($emitente, Constants::AMBIENTE_PRODUCAO);
+$nfse = NFSe::getInstance($emitente, Constants::AMBIENTE_HOMOLOGACAO);
 
 $nfse
     ->setAwsS3($s3)
