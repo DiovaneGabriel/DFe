@@ -11,6 +11,12 @@ class Constants
     const SITUACAO_EMITIDO = 1;
     const SITUACAO_CANCELADO = 2;
 
+    const DESCRICOES_SITUACAO = [
+        self::SITUACAO_AGUARDANDO => "Aguardando",
+        self::SITUACAO_EMITIDO => "Emitido",
+        self::SITUACAO_CANCELADO => "Cancelado",
+    ];
+
     const DOCUMENTO_RPS = 'rps';
     const DOCUMENTO_NFSE = 'nfse';
 
