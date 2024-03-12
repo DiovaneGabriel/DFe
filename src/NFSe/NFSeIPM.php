@@ -11,8 +11,8 @@ use DBarbieri\DFe\Config\Constants;
 use DBarbieri\DFe\Config\Parameters;
 use DBarbieri\DFe\Exception\NFSeIPMException;
 use DBarbieri\DFe\NFSe;
+use DBarbieri\Graylog\Graylog;
 use Exception;
-use Graylog\Graylog;
 
 class NFSeIPM extends NFSe
 {
