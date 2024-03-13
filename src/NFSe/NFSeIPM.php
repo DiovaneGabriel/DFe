@@ -277,6 +277,9 @@ class NFSeIPM extends NFSe
                 throw new NFSeIPMException((array)$obj->mensagem->codigo);
             }
         } else {
+            #por garantia deleta o cache
+            Cache::deleteCache("cookieNFSeIPM" . $this->getEmitente()->getCnpj());
+
             $error = $response->return ?: ($response->error ?: $response->code);
             $this->createLog($this->getXml(), $error, Graylog::LEVEL_FATAL);
             throw new Exception($error);
