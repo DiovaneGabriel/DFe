@@ -277,8 +277,9 @@ class NFSeIPM extends NFSe
                 throw new NFSeIPMException((array)$obj->mensagem->codigo);
             }
         } else {
-            $this->createLog($this->getXml(), $response->return ? $response->return : $response->code, Graylog::LEVEL_FATAL);
-            throw new Exception($response->return);
+            $error = $response->return ?: ($response->error ?: $response->code);
+            $this->createLog($this->getXml(), $error, Graylog::LEVEL_FATAL);
+            throw new Exception($error);
         }
 
         $this->createLog($this->getXml(), XML::minify($response));
