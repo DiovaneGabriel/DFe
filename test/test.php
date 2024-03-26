@@ -14,7 +14,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv::createImmutable(__DIR__, '../.env');
 $dotenv->load();
 
-$graylog = new Graylog('http://graylog', 12201);
+$graylog = new Graylog('http://graylog.dbservicos.info', 12201);
 $s3 = new S3($_ENV['AWSS3_KEY'], $_ENV['AWSS3_SECRET'], $_ENV['AWSS3_REGION'], $_ENV['AWSS3_BUCKET']);
 $s3->setGraylog($graylog);
 
@@ -66,13 +66,13 @@ $nfseItem
     ->setValorTributavel(1.2)
     ->setValor(1.2);
 
-// $nfse->setNumeroRps(23)
+// $nfse->setNumeroRps(25)
 //     ->setValor(1.2)
 //     ->addItem($nfseItem)
 //     ->emitir();
 
 // $nfse->cancelar("NFS-e emitida para teste");
-$nfse->consultar("8899738882205194198620241229122023253915");
+// $nfse->consultar("8899738882205194198620241229122023253915");
 
 echo '<pre>';
 var_dump($nfse->getXml());
