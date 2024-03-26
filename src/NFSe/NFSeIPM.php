@@ -80,7 +80,7 @@ class NFSeIPM extends NFSe
                 $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
                 $this->setSituacao(Constants::SITUACAO_CANCELADO);
 
-                // $this->consultar();
+                $this->consultar();
             }
         }
 
@@ -120,9 +120,9 @@ class NFSeIPM extends NFSe
             $this->setProtocoloAutorizacao(((array)$xmlResponse->cod_verificador_autenticidade)[0]);
             $this->setSituacao(Constants::SITUACAO_EMITIDO);
 
-            // if ($this->getAmbiente() == Constants::AMBIENTE_PRODUCAO) {
-            //     $this->consultar();
-            // }
+            if ($this->getAmbiente() == Constants::AMBIENTE_PRODUCAO) {
+                $this->consultar();
+            }
         }
 
         return $this;
@@ -227,9 +227,9 @@ class NFSeIPM extends NFSe
         $headers[] = 'Authorization: Basic ' . $auth;
         $headers[] = 'Content-Type: multipart/form-data';
 
-        if ($cookie) {
-            $headers[] = 'Cookie: PHPSESSID=' . $cookie;
-        }
+        // if ($cookie) {
+        //     $headers[] = 'Cookie: PHPSESSID=' . $cookie;
+        // }
 
         # cria arquivo temporario
         $tempFile = tempnam(sys_get_temp_dir(), $this->getEmitente()->getCnpj() . '_');
